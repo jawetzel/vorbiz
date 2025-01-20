@@ -117,11 +117,9 @@ function SalesStackNavigator() {
                             }}
                         >
                             <FontAwesomeIcon icon={faQrcode} size={24} color={themeColors.backgroundThree} />
-\                        </TouchableOpacity>
+                        </TouchableOpacity>
                     ),
                 })}
-
-
             />
         </ManageStack.Navigator>
     );

@@ -334,13 +334,18 @@ export default function SaleScreen() {
                             }}
                         >
                             <Picker.Item label="Select Variant" value={null} />
-                            {variants.map((variant) => (
-                                <Picker.Item
-                                    key={variant.id}
-                                    label={`${variant.size || ''} ${variant.color || ''}`}
-                                    value={variant.id}
-                                />
-                            ))}
+                            {variants.map((variant) => {
+                                const variantLabel = [variant.size, variant.color]
+                                    .filter(Boolean)
+                                    .join(' ') || 'Default';
+                                return (
+                                    <Picker.Item
+                                        key={variant.id}
+                                        label={variantLabel}
+                                        value={variant.id}
+                                    />
+                                );
+                            })}
                         </Picker>
                     </View>
                 )}
@@ -407,11 +412,11 @@ export default function SaleScreen() {
                     </View>
                     <View style={footerStyles.totalRow}>
                         <Text style={footerStyles.taxLabel}>
-                            Tax&nbsp;
+                            <Text>Tax </Text>
                             <Text style={{fontSize: 10}}>
-                                ({stateTaxRate + countyParishTaxRate}%)
+                                ({(stateTaxRate + countyParishTaxRate).toFixed(2)}%)
                             </Text>
-                            :
+                            <Text>: </Text>
                         </Text>
                         <Text style={footerStyles.taxValue}>${tax.toFixed(2)}</Text>
                     </View>
