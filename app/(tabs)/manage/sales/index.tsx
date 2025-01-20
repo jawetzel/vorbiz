@@ -82,17 +82,17 @@ export default function SaleScreen() {
                 setStateTaxRate(data.stateTaxRate ?? 0);
                 setCountyParishTaxRate(data.countyParishTaxRate ?? 0);
                 setLocation(data);
-                UpdateTotalsSection();
+                UpdateTotalsSection(data.countyParishTaxRate ?? 0, data.stateTaxRate ?? 0);
             }
         }
     }
 
-    const UpdateTotalsSection = () => {
+    const UpdateTotalsSection = (localCountyTaxRate = countyParishTaxRate, localStateTaxRate = stateTaxRate) => {
         const newSubtotal = lineItems.reduce((sum, item) => sum + item.linePrice, 0);
-        const newTax = newSubtotal * ((countyParishTaxRate + stateTaxRate) / 100);
+        const calculatedTax = Math.round(newSubtotal * ((localCountyTaxRate + localStateTaxRate) / 100) * 100) / 100;
         setSubtotal(newSubtotal);
-        setTax(newTax);
-        setTotal(newSubtotal + newTax);
+        setTax(calculatedTax);
+        setTotal(newSubtotal + calculatedTax);
     }
 
     useFocusEffect(useCallback(() => {
@@ -240,7 +240,7 @@ export default function SaleScreen() {
         setLocation(selectedLocation);
         setStateTaxRate(selectedLocation.stateTaxRate ?? 0);
         setCountyParishTaxRate(selectedLocation.countyParishTaxRate ?? 0);
-        UpdateTotalsSection();
+        UpdateTotalsSection(selectedLocation.countyParishTaxRate ?? 0, selectedLocation.stateTaxRate ?? 0);
         navigation.setParams({
             toggleQRScanner: route.params?.toggleQRScanner,
             showLocationModal: false
