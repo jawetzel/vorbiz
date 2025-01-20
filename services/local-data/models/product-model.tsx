@@ -1,5 +1,6 @@
 import {Database, Model} from '@nozbe/watermelondb';
 import {field, text} from '@nozbe/watermelondb/decorators';
+import {Associations} from "@nozbe/watermelondb/Model";
 
 export default class ProductModel extends Model {
     static table = 'products';
@@ -32,8 +33,10 @@ export default class ProductModel extends Model {
         { name: 'dimensionUnitOfMeasurement', type: 'string' },
         { name: 'weightLbs', type: 'number' },
         { name: 'shippingWeightLbs', type: 'number'},
+        {name: 'isActive', type: 'boolean' },
+        {name: 'quickButton', type: 'boolean' },
     ];
-    static associations: Record<string, { type: 'has_many'; foreignKey: string }>  = {
+    static associations: Associations  = {
         saleLines: { type: 'has_many', foreignKey: 'product_id' },
         productVariants: { type: 'has_many', foreignKey: 'product_id' },
     }
@@ -72,6 +75,8 @@ export default class ProductModel extends Model {
     @field('canPersonalizeSize') canPersonalizeSize!: boolean;
     @field('canPersonalizeCustomMessage') canPersonalizeCustomMessage!: boolean;
     @field('canPersonalizeGiftwrap') canPersonalizeGiftwrap!: boolean;
+    @field('isActive') isActive!: boolean;
+    @field('quickButton') quickButton!: boolean;
 
     // Default numeric fields to 0
     @field('price') price!: number | null;

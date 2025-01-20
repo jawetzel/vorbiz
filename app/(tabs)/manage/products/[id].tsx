@@ -60,6 +60,7 @@ export default function ProductDetailScreen() {
             shippingDimensionH: 0.0,    shippingDimensionW: 0.0,    shippingDimensionD: 0.0,
             dimensionUnitOfMeasurement: 'LBS',
             weightLbs: 0.0,             shippingWeightLbs: 0.0,
+            isActive: true,             quickButton: false
         } as ProductModel);
 
     const [errors, setErrors] =
@@ -132,6 +133,8 @@ export default function ProductDetailScreen() {
             dimensionUnitOfMeasurement: fetchedProduct.dimensionUnitOfMeasurement ?? '',
             weightLbs: fetchedProduct.weightLbs ?? '',
             shippingWeightLbs: fetchedProduct.shippingWeightLbs ?? '',
+            isActive: fetchedProduct.isActive ?? '',
+            quickButton: fetchedProduct.quickButton ?? '',
         } as ProductModel;
     }
     const handleSave = async () => {
@@ -225,12 +228,12 @@ export default function ProductDetailScreen() {
 
     const productInfoGroup =  {
             category: 'Product Info',
-            fields: ['name', 'description', 'price', 'category', 'brand', 'image', 'certifications']
+            fields: ['quickButton', 'name', 'description', 'price', 'category', 'brand', 'image', 'certifications', 'upc', 'isActive']
         }
     const fieldGroups = [
         {
             category: 'Product Identification',
-            fields: ['sku', 'upc', 'asin', 'category', 'brand']
+            fields: ['sku', 'asin', 'category', 'brand']
         },
         {
             category: 'Product Dimensions',
@@ -251,6 +254,7 @@ export default function ProductDetailScreen() {
         },
     ];
     const fieldDisplayNames: Record<string, string> = {
+        quickButton: 'Sales Quick Button',
         name: "Name",
         description: "Description",
         category: "Category",
@@ -277,7 +281,8 @@ export default function ProductDetailScreen() {
         shippingDimensionD: "Shipping Length",
         dimensionUnitOfMeasurement: "Size Unit Of Measurement",
         weightLbs: "Weight (LBS)",
-        shippingWeightLbs: "Shipping Weight (LBS)"
+        shippingWeightLbs: "Shipping Weight (LBS)",
+        isActive: "Product Active",
     };
 
     const openModal = (variantId: string | null) => {
@@ -311,11 +316,16 @@ export default function ProductDetailScreen() {
                     style={styles.sectionHeader}
                 >
                     <Text style={styles.groupTitle}>{category}</Text>
-                    {collapsedSections[category] ? (
-                        <FontAwesomeIcon icon={faCaretSquareUp} size={20} color={themeColors.text} />
-                    ) : (
-                        <FontAwesomeIcon icon={faCaretSquareDown} size={20} color={themeColors.text} />
-                    )}
+                    {category !== 'Product Info' &&
+                    <>
+                        {collapsedSections[category] ? (
+                            <FontAwesomeIcon icon={faCaretSquareUp} size={20} color={themeColors.text} />
+                        ) : (
+                            <FontAwesomeIcon icon={faCaretSquareDown} size={20} color={themeColors.text} />
+                        )}
+                    </>
+                    }
+
                 </TouchableOpacity>
                 {!collapsedSections[category] && (
                     <View style={styles.sectionContent}>

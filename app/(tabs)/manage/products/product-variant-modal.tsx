@@ -31,6 +31,7 @@ const CreateProductVariantModal:
             image: '',
             product_id: productId,
             upc: '',
+            isActive: true,
         } as ProductVariantModel);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] =
@@ -41,6 +42,7 @@ const CreateProductVariantModal:
             price: '',
             image: '',
             upc: '',
+            isActive: '',
         });
 
     const mapVariantForState = (fetchedProduct: ProductVariantModel) => {
@@ -52,7 +54,7 @@ const CreateProductVariantModal:
             image: fetchedProduct.image,
             upc: fetchedProduct.upc,
             product_id: productId,
-
+            isActive: fetchedProduct.isActive,
         } as ProductVariantModel;
     }
 
@@ -171,7 +173,8 @@ const CreateProductVariantModal:
             color: "Color",
             material: "Material",
             price: "Price",
-            image: "Image Url"
+            image: "Image Url",
+            isActive: "Variant Active",
         };
     return (
 
@@ -179,7 +182,7 @@ const CreateProductVariantModal:
             <View style={styles.modalContainer}>
                 <Text style={styles.title}>{variantIdState ? "Update" : "Create"} Product Variant</Text>
 
-                {['upc', 'size', 'color', 'material', 'price', 'image'].map((field) => {
+                {['upc', 'size', 'color', 'material', 'price', 'image', 'isActive'].map((field) => {
                     return <InputField key={field}
                                        title={fieldDisplayNames[field]}
                                        fieldType={ProductVariantModel.GetColumnType(field)}

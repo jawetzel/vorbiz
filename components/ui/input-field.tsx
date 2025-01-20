@@ -1,5 +1,5 @@
-import {StyleSheet, Switch, Text, TextInput, View} from "react-native";
-import React from "react";
+import {StyleSheet, Switch, Text, TextInput, TouchableWithoutFeedback, View} from "react-native";
+import React, {useRef} from "react";
 import {themeColors} from "@/components/ui/theme-colors";
 
 type InputFieldProps = {
@@ -20,6 +20,9 @@ const InputField: React.FC<InputFieldProps> = ({
                                                     handleChange,
                                                    error
                                                 }) => {
+    const inputRef = useRef<TextInput | null>(null); // Reference to the input
+
+
     if (fieldType === 'boolean') {
         let displayValue = false;
         if(typeof value === 'boolean') displayValue = value;
@@ -38,44 +41,54 @@ const InputField: React.FC<InputFieldProps> = ({
     }
 
     if(fieldType === 'string'){
-        return <View style={styles.fieldContainer}>
-            {title && title.length > 0 ? <Text style={styles.label}>{title}</Text> : null}
-            <View style={styles.textInputContainer}>
-                <TextInput
-                    style={styles.input}
-                    value={String(value)}
-                    onChangeText={(text) => handleChange(fieldName, text)}
-                />
+        return <TouchableWithoutFeedback
+            onPress={() => inputRef.current?.focus()} // Focus input when tapped
+        >
+            <View style={styles.fieldContainer}>
+                {title && title.length > 0 ? <Text style={styles.label}>{title}</Text> : null}
+                <View style={styles.textInputContainer}>
+                    <TextInput
+                        ref={inputRef}
+                        style={styles.input}
+                        value={String(value)}
+                        onChangeText={(text) => handleChange(fieldName, text)}
+                    />
+                </View>
+                {error ? <Text style={styles.error}>{error}</Text> : null}
             </View>
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-        </View>
+        </TouchableWithoutFeedback>
     }
     if(fieldType === 'number'){
-        return <View style={styles.fieldContainer}>
-            {title && title.length > 0 ? <Text style={styles.label}>{title}</Text> : null}
-            <View style={styles.textInputContainer}>
-                <TextInput
-                    style={styles.input}
-                    value={String(value)}
-                    keyboardType="numeric"
-                    onChangeText={(text) => {
-                        // Validate intermediate input as numeric, including incomplete decimals
-                        if (/^(\d+(\.\d*)?|\.\d*)?$/.test(text)) {
-                            // Update state as string temporarily
-                            handleChange(fieldName, text);
-                        }
-                    }}
-                    onBlur={() => {
-                        const currentValue = value;
-                        if (typeof currentValue === 'string') {
-                            const numericValue = parseFloat(currentValue);
-                            handleChange(fieldName, isNaN(numericValue) ? 0 : numericValue); // Finalize as number
-                        }
-                    }}
-                />
+        return <TouchableWithoutFeedback
+            onPress={() => inputRef.current?.focus()} // Focus input when tapped
+        >
+            <View style={styles.fieldContainer}>
+                {title && title.length > 0 ? <Text style={styles.label}>{title}</Text> : null}
+                <View style={styles.textInputContainer}>
+                    <TextInput
+                        ref={inputRef}
+                        style={styles.input}
+                        value={String(value)}
+                        keyboardType="numeric"
+                        onChangeText={(text) => {
+                            // Validate intermediate input as numeric, including incomplete decimals
+                            if (/^(\d+(\.\d*)?|\.\d*)?$/.test(text)) {
+                                // Update state as string temporarily
+                                handleChange(fieldName, text);
+                            }
+                        }}
+                        onBlur={() => {
+                            const currentValue = value;
+                            if (typeof currentValue === 'string') {
+                                const numericValue = parseFloat(currentValue);
+                                handleChange(fieldName, isNaN(numericValue) ? 0 : numericValue); // Finalize as number
+                            }
+                        }}
+                    />
+                </View>
+                {error ? <Text style={styles.error}>{error}</Text> : null}
             </View>
-            {error ? <Text style={styles.error}>{error}</Text> : null}
-        </View>
+        </TouchableWithoutFeedback>
     }
 
     return null;

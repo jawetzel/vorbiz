@@ -1,5 +1,6 @@
 import { Model, Database } from '@nozbe/watermelondb';
 import {field, text} from '@nozbe/watermelondb/decorators';
+import {Associations} from "@nozbe/watermelondb/Model";
 
 export default class LocationModel extends Model {
     static table = 'locations';
@@ -17,7 +18,7 @@ export default class LocationModel extends Model {
         { name: 'email', type: 'string' },
         { name: 'contactName', type: 'string' },
     ];
-    static associations: Record<string, { type: 'has_many'; foreignKey: string }>  = {
+    static associations: Associations  = {
         sales: { type: 'has_many', foreignKey: 'sale_id' },
     }
     static GetColumnType(column: string){

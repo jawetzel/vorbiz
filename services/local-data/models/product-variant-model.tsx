@@ -1,6 +1,7 @@
 import { Model, Database } from '@nozbe/watermelondb';
 import { Q } from '@nozbe/watermelondb';
 import { field, text } from '@nozbe/watermelondb/decorators';
+import {Associations} from "@nozbe/watermelondb/Model";
 
 export default class ProductVariantModel extends Model {
     static table = 'productVariants';
@@ -13,9 +14,11 @@ export default class ProductVariantModel extends Model {
         {name: 'price', type: 'number'},
         {name: 'image', type: 'string'},
         {name: 'upc', type: 'string'},
+        {name: 'isActive', type: 'boolean' },
     ];
-    static associations: Record<string, { type: 'belongs_to'; key: string }> = {
+    static associations: Associations = {
         products: { type: 'belongs_to', key: 'product_id' },
+        saleLines: { type: 'has_many', foreignKey: 'productVariant_id' },
     }
 
     static GetColumnType(column: string){
@@ -31,6 +34,7 @@ export default class ProductVariantModel extends Model {
     @field('price') price!: number | null;
     @text('image') image!: string | null;
     @text('upc') upc!: string | null;
+    @field('isActive') isActive!: boolean;
 
     static validate(variantData: any) {
         const errors: Record<string, string> = {};
