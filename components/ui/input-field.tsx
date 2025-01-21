@@ -1,10 +1,18 @@
-import {StyleSheet, Switch, Text, TextInput, TouchableWithoutFeedback, View} from "react-native";
+import {KeyboardTypeOptions, StyleSheet, Switch, Text, TextInput, TouchableWithoutFeedback, View} from "react-native";
 import React, {useRef} from "react";
 import {themeColors} from "@/components/ui/theme-colors";
+import ProductVariantModel from "@/services/local-data/models/product-variant-model";
+import {InputFieldTypes} from "@/models/constants";
+
+export const InputDecorators = {
+    percentage: 'percentage',
+    money: 'money'
+}
 
 type InputFieldProps = {
     title?: string;
     fieldType: string | undefined,
+    inputType?: string | null,
     fieldName: string,
     value: any,
     handleChange: (fieldName: string, value: string | number | boolean) => void,
@@ -15,6 +23,7 @@ type InputFieldProps = {
 const InputField: React.FC<InputFieldProps> = ({
                                                     title,
                                                     fieldType,
+                                                   inputType,
                                                     fieldName,
                                                     value,
                                                     handleChange,
@@ -22,6 +31,34 @@ const InputField: React.FC<InputFieldProps> = ({
                                                 }) => {
     const inputRef = useRef<TextInput | null>(null); // Reference to the input
 
+    let keyboardType = "default" as KeyboardTypeOptions;
+    if(inputType){
+        switch (inputType){
+            case InputFieldTypes.decimal: {
+                keyboardType = 'decimal-pad';
+                break;
+            }
+            case InputFieldTypes.money:{
+                keyboardType = 'decimal-pad';
+                break;
+            }
+            case InputFieldTypes.numeric:{
+                keyboardType = 'number-pad';
+                break;
+            }
+            case InputFieldTypes.percent:{
+                keyboardType = 'decimal-pad';
+                break;
+            }
+            case InputFieldTypes.phone:{
+                keyboardType = 'phone-pad';
+                break;
+            }
+            case InputFieldTypes.email:{
+                keyboardType = 'email-address'
+            }
+        }
+    }
 
     if (fieldType === 'boolean') {
         let displayValue = false;
@@ -41,6 +78,8 @@ const InputField: React.FC<InputFieldProps> = ({
     }
 
     if(fieldType === 'string'){
+
+
         return <TouchableWithoutFeedback
             onPress={() => inputRef.current?.focus()} // Focus input when tapped
         >
@@ -49,6 +88,7 @@ const InputField: React.FC<InputFieldProps> = ({
                 <View style={styles.textInputContainer}>
                     <TextInput
                         ref={inputRef}
+                        keyboardType={keyboardType}
                         style={styles.input}
                         value={String(value)}
                         onChangeText={(text) => handleChange(fieldName, text)}
@@ -59,17 +99,26 @@ const InputField: React.FC<InputFieldProps> = ({
         </TouchableWithoutFeedback>
     }
     if(fieldType === 'number'){
+        if(keyboardType === 'default'){
+            keyboardType = 'decimal-pad';
+        }
+
         return <TouchableWithoutFeedback
             onPress={() => inputRef.current?.focus()} // Focus input when tapped
         >
             <View style={styles.fieldContainer}>
                 {title && title.length > 0 ? <Text style={styles.label}>{title}</Text> : null}
                 <View style={styles.textInputContainer}>
+                    {inputType && InputDecorators.money === inputType &&
+                        <View style={styles.percentContainer}>
+                            <Text style={styles.percentText}>$</Text>
+                        </View>
+                    }
                     <TextInput
                         ref={inputRef}
                         style={styles.input}
                         value={String(value)}
-                        keyboardType="numeric"
+                        keyboardType={keyboardType}
                         onChangeText={(text) => {
                             // Validate intermediate input as numeric, including incomplete decimals
                             if (/^(\d+(\.\d*)?|\.\d*)?$/.test(text)) {
@@ -85,6 +134,11 @@ const InputField: React.FC<InputFieldProps> = ({
                             }
                         }}
                     />
+                    {inputType && InputDecorators.percentage === inputType &&
+                        <View style={styles.percentContainer}>
+                            <Text style={styles.percentText}>%</Text>
+                        </View>
+                    }
                 </View>
                 {error ? <Text style={styles.error}>{error}</Text> : null}
             </View>
@@ -97,7 +151,8 @@ const InputField: React.FC<InputFieldProps> = ({
 
 const styles = StyleSheet.create({
     fieldContainer: {
-        marginBottom: 4,
+        margin: 4,
+        marginVertical: 6
     },
     label: {
         fontSize: 14,
@@ -106,11 +161,10 @@ const styles = StyleSheet.create({
         marginTop: 4
     },
     input: {
-        borderBottomWidth: 1,
-        marginBottom: 6,
+        flex: 1,
+        marginBottom: 0,
         paddingVertical: 4, // Ensures consistent vertical spacing
         paddingHorizontal: 8, // Padding for left and right
-        borderBottomColor: themeColors.borders,
         minHeight: 25, // Ensures a visible height
         fontSize: 14, // Readable text size
     },
@@ -120,14 +174,29 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     textInputContainer: {
-        marginBottom: 4,
+        flexDirection: 'row',
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        height: 40,
     },
     error: {
         color: themeColors.dangerActive,
         marginTop: 4, // Add spacing above error text
         fontSize: 12,
     },
-
+    percentContainer: {
+        backgroundColor: '#f0f0f0',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 10,
+        borderLeftWidth: 1,
+        borderLeftColor: '#ccc',
+    },
+    percentText: {
+        color: '#666',
+        fontSize: 16,
+    },
 });
 
 export default InputField;

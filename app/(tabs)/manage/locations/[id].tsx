@@ -15,6 +15,7 @@ import InputField from "@/components/ui/input-field";
 import DeleteButton from "@/components/ui/buttons/delete-button";
 import SaveButton from "@/components/ui/buttons/save-button";
 import {themeColors} from "@/components/ui/theme-colors";
+import {Loc} from "sucrase/dist/types/parser/traverser/base";
 
 export default function LocationDetailScreen() {
     const database = useDatabase();
@@ -181,18 +182,19 @@ export default function LocationDetailScreen() {
                     'phone', 'email',
                     'contactName',
                     'countyParishTaxZone', 'countyParishTaxRate', 'stateTaxRate'
-                ].map((field) => (
-                    <View key={'locations_' + field} style={styles.sectionContent}>
+                ].map((field) => {
+                    return <View key={'locations_' + field} style={styles.sectionContent}>
                         <InputField
                             title={field.charAt(0).toUpperCase() + field.slice(1)}
                             fieldType={LocationModel.GetColumnType(field)}
+                            inputType={LocationModel.GetInputType(field)}
                             fieldName={field}
                             value={location[field as keyof LocationErrors]}
                             handleChange={handleChange}
                             error={errors[field]}
                         />
                     </View>
-                ))}
+                })}
             </View>
 
             <DeleteButton handle={handleDelete} />
@@ -233,6 +235,5 @@ const styles = StyleSheet.create({
     sectionContent: {
         paddingHorizontal: 12,
         backgroundColor: themeColors.backgroundThree,
-        paddingVertical: 6
     },
 });

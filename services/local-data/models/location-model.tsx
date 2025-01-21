@@ -1,6 +1,7 @@
 import { Model, Database } from '@nozbe/watermelondb';
 import {field, text} from '@nozbe/watermelondb/decorators';
 import {Associations} from "@nozbe/watermelondb/Model";
+import {InputFieldTypes} from "@/models/constants";
 
 export default class LocationModel extends Model {
     static table = 'locations';
@@ -10,12 +11,12 @@ export default class LocationModel extends Model {
         { name: 'address', type: 'string' },
         { name: 'city', type: 'string' },
         { name: 'state', type: 'string' },
-        { name: 'zipCode', type: 'string' },
+        { name: 'zipCode', type: 'string', inputType: InputFieldTypes.numeric },
         { name: 'countyParishTaxZone', type: 'string' },
-        { name: 'countyParishTaxRate', type: 'number' },
-        { name: 'stateTaxRate', type: 'number' },
-        { name: 'phone', type: 'string' },
-        { name: 'email', type: 'string' },
+        { name: 'countyParishTaxRate', type: 'number', inputType: InputFieldTypes.percent},
+        { name: 'stateTaxRate', type: 'number', inputType: InputFieldTypes.percent },
+        { name: 'phone', type: 'string', inputType: InputFieldTypes.phone },
+        { name: 'email', type: 'string', inputType: InputFieldTypes.email},
         { name: 'contactName', type: 'string' },
     ];
     static associations: Associations  = {
@@ -24,6 +25,10 @@ export default class LocationModel extends Model {
     static GetColumnType(column: string){
         const columnDef = LocationModel.columns.find((col) => col.name === column);
         return columnDef?.type;
+    }
+    static GetInputType(column: string){
+        const columnDef = LocationModel.columns.find((col) => col.name === column);
+        return columnDef?.inputType ?? null;
     }
 
     @text('name') name!: string;

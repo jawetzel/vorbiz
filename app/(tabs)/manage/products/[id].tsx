@@ -20,6 +20,7 @@ import DeleteButton from "@/components/ui/buttons/delete-button";
 import SaveButton from "@/components/ui/buttons/save-button";
 import {themeColors} from "@/components/ui/theme-colors";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import LocationModel from "@/services/local-data/models/location-model";
 
 type ProductDetailScreenNavigationProp = NativeStackNavigationProp<
     RootStackParamList,
@@ -334,6 +335,7 @@ export default function ProductDetailScreen() {
                                 key={'product_' + category + field}
                                 title={fieldDisplayNames[field]}
                                 fieldType={ProductModel.GetColumnType(field)}
+                                inputType={ProductModel.GetInputType(field)}
                                 fieldName={field}
                                 value={product[field as keyof ProductModel]}
                                 handleChange={handleChange}

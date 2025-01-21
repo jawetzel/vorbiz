@@ -1,6 +1,7 @@
 import {Database, Model} from '@nozbe/watermelondb';
 import {field, text} from '@nozbe/watermelondb/decorators';
 import {Associations} from "@nozbe/watermelondb/Model";
+import {InputFieldTypes} from "@/models/constants";
 
 export default class ProductModel extends Model {
     static table = 'products';
@@ -9,7 +10,7 @@ export default class ProductModel extends Model {
         { name: 'name', type: 'string' },
         { name: 'description', type: 'string' },
         { name: 'category', type: 'string' },
-        { name: 'price', type: 'number' },
+        { name: 'price', type: 'number', inputType: InputFieldTypes.money },
         { name: 'sku', type: 'string' },
         { name: 'brand', type: 'string' },
         { name: 'image', type: 'string' },
@@ -21,18 +22,18 @@ export default class ProductModel extends Model {
         { name: 'canPersonalizeSize', type: 'boolean' },
         { name: 'canPersonalizeCustomMessage', type: 'boolean' },
         { name: 'canPersonalizeGiftwrap', type: 'boolean' },
-        { name: 'upc', type: 'string' },
+        { name: 'upc', type: 'string', inputType: InputFieldTypes.numeric },
         { name: 'asin', type: 'string' },
         { name: 'certifications', type: 'string' },
-        { name: 'dimensionH', type: 'number'},
-        { name: 'dimensionW', type: 'number'},
-        { name: 'dimensionD', type: 'number' },
-        { name: 'shippingDimensionH', type: 'number' },
-        { name: 'shippingDimensionW', type: 'number'},
-        { name: 'shippingDimensionD', type: 'number' },
+        { name: 'dimensionH', type: 'number', inputType: InputFieldTypes.decimal},
+        { name: 'dimensionW', type: 'number', inputType: InputFieldTypes.decimal},
+        { name: 'dimensionD', type: 'number', inputType: InputFieldTypes.decimal },
+        { name: 'shippingDimensionH', type: 'number', inputType: InputFieldTypes.decimal },
+        { name: 'shippingDimensionW', type: 'number', inputType: InputFieldTypes.decimal},
+        { name: 'shippingDimensionD', type: 'number', inputType: InputFieldTypes.decimal},
         { name: 'dimensionUnitOfMeasurement', type: 'string' },
-        { name: 'weightLbs', type: 'number' },
-        { name: 'shippingWeightLbs', type: 'number'},
+        { name: 'weightLbs', type: 'number',  inputType: InputFieldTypes.decimal},
+        { name: 'shippingWeightLbs', type: 'number', inputType: InputFieldTypes.decimal},
         {name: 'isActive', type: 'boolean' },
         {name: 'quickButton', type: 'boolean' },
     ];
@@ -45,6 +46,11 @@ export default class ProductModel extends Model {
         const columnDef = ProductModel.columns.find((col) => col.name === column);
         return columnDef?.type;
     }
+    static GetInputType(column: string){
+        const columnDef = ProductModel.columns.find((col) => col.name === column);
+        return columnDef?.inputType ?? null;
+    }
+
 
     // Default string fields to empty string ""
     @text('name') name!: string | null;

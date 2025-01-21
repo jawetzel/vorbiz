@@ -2,6 +2,7 @@ import { Model, Database } from '@nozbe/watermelondb';
 import { Q } from '@nozbe/watermelondb';
 import { field, text } from '@nozbe/watermelondb/decorators';
 import {Associations} from "@nozbe/watermelondb/Model";
+import {InputFieldTypes} from "@/models/constants";
 
 export default class ProductVariantModel extends Model {
     static table = 'productVariants';
@@ -11,9 +12,9 @@ export default class ProductVariantModel extends Model {
         {name: 'size', type: 'string'},
         {name: 'color', type: 'string'},
         {name: 'material', type: 'string'},
-        {name: 'price', type: 'number'},
+        {name: 'price', type: 'number', inputType: InputFieldTypes.money},
         {name: 'image', type: 'string'},
-        {name: 'upc', type: 'string'},
+        {name: 'upc', type: 'string', inputType: InputFieldTypes.numeric},
         {name: 'isActive', type: 'boolean' },
     ];
     static associations: Associations = {
@@ -25,7 +26,10 @@ export default class ProductVariantModel extends Model {
         const columnDef = ProductVariantModel.columns.find((col) => col.name === column);
         return columnDef?.type;
     }
-
+    static GetInputType(column: string){
+        const columnDef = ProductVariantModel.columns.find((col) => col.name === column);
+        return columnDef?.inputType ?? null;
+    }
 
     @field('product_id') product_id!: string | null;
     @text('size') size!: string | null;

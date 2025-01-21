@@ -7,6 +7,7 @@ import DeleteButton from "@/components/ui/buttons/delete-button";
 import SaveButton from "@/components/ui/buttons/save-button";
 import CancelButton from "@/components/ui/buttons/cancel-button";
 import {themeColors} from "@/components/ui/theme-colors";
+import ProductModel from "@/services/local-data/models/product-model";
 
 interface CreateProductVariantModalProps {
     productId: string; // The ID of the product
@@ -186,6 +187,7 @@ const CreateProductVariantModal:
                     return <InputField key={field}
                                        title={fieldDisplayNames[field]}
                                        fieldType={ProductVariantModel.GetColumnType(field)}
+                                       inputType={ProductVariantModel.GetInputType(field)}
                                        fieldName={field}
                                        value={variant[field as keyof ProductVariantModel]}
                                        handleChange={handleChange}
