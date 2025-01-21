@@ -170,12 +170,17 @@ export default function SaleScreen() {
     };
 
     const handleSubmit = async () => {
+        if(!location){
+            Alert.alert('Select Location', 'Please select a location by clicking the map icon in the top left.');
+            return;
+        }
+
         const saleDate = new Date();
 
         try {
             await database.write(async () => {
                 const newSale = await SaleModel.createTrans(database, {
-                    location_id: null,
+                    location_id: location.id,
                     stateTaxRate: stateTaxRate,
                     countyParishTaxRate: countyParishTaxRate,
                     saleDate: saleDate.getTime(),
@@ -187,8 +192,8 @@ export default function SaleScreen() {
 
                 for (const lineItem of lineItems) {
                     const subtotal = lineItem.linePrice;
-                    const countyParishTaxAmount = subtotal * countyParishTaxRate;
-                    const stateTaxAmount = subtotal * stateTaxRate;
+                    const countyParishTaxAmount = subtotal * (countyParishTaxRate / 100);
+                    const stateTaxAmount = subtotal * (stateTaxRate / 100);
                     const discount = 0;
                     const total = subtotal + countyParishTaxAmount + stateTaxAmount - discount;
 
@@ -629,8 +634,6 @@ const footerStyles = StyleSheet.create({
         fontWeight: '600',
     },
 });
-
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -16,18 +16,17 @@ import database from '../services/local-data/context';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faHospital, faMoneyBill1, faEdit } from '@fortawesome/free-regular-svg-icons'; // Import the icons you want to use
 import { faQrcode, faMapLocation } from '@fortawesome/free-solid-svg-icons';
-
+import { faFileInvoice } from '@fortawesome/free-solid-svg-icons'
 import ManageScreen from "@/app/(tabs)/manage/index";
 import LocationScreen from "@/app/(tabs)/manage/locations/index";
 import LocationDetailScreen from "@/app/(tabs)/manage/locations/[id]";
-import HomeScreen from "@/app/(tabs)/index";
 import ProductsScreen from "@/app/(tabs)/manage/products";
 import ProductDetailScreen from "@/app/(tabs)/manage/products/[id]";
 import {themeColors} from "@/components/ui/theme-colors";
 import SaleScreen from "@/app/(tabs)/manage/sales";
 import {TouchableOpacity, Text} from "react-native";
 import {RootStackParamList} from "@/models/ProjectRouteParams";
-import ReportingScreen from "@/app/(tabs)/manage/reporting";
+import ReportingScreen from "@/app/(tabs)/reporting";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -55,6 +54,16 @@ const ScreenOptions = {
 } as NativeStackNavigationOptions;
 
 
+function ReportingStackNavigator(){
+    return <ManageStack.Navigator screenOptions={ScreenOptions}>
+        <ManageStack.Screen
+            name="Reporting"
+            component={ReportingScreen}
+        />
+    </ManageStack.Navigator>
+}
+
+
 function ManageStackNavigator() {
     return (
       <ManageStack.Navigator screenOptions={ScreenOptions}>
@@ -62,7 +71,6 @@ function ManageStackNavigator() {
             name="Management Home"
             component={ManageScreen}
         />
-          <ManageStack.Screen name="Reporting" component={ReportingScreen} />
           <ManageStack.Screen name="Locations" component={LocationScreen} />
           <ManageStack.Screen name="LocationDetail" component={LocationDetailScreen}/>
           <ManageStack.Screen name="Products" component={ProductsScreen} />
@@ -180,11 +188,12 @@ export default function RootLayout() {
                       tabBarInactiveTintColor: themeColors.textLight,
                       headerShown: false,
                   }}>
-                      <Tab.Screen name="Home"  component={HomeScreen}
+                      <Tab.Screen name="Reporting"  component={ReportingStackNavigator}
+
                                   options={{
                                       tabBarIcon: ({ color, size }) => (
-                                          <FontAwesomeIcon icon={faHospital} size={size} color={color} />
-                                      )
+                                          <FontAwesomeIcon icon={faFileInvoice} size={size} color={color} />
+                                      ),
                                   }}/>
                       <Tab.Screen name="Manage" component={ManageStackNavigator}
                                   options={{
