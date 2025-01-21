@@ -3,7 +3,8 @@ import { Camera,
     useCameraDevice,
     useCodeScanner } from 'react-native-vision-camera';
 import { StyleSheet, TouchableOpacity, View, Text } from 'react-native';
-import {Ionicons} from "@expo/vector-icons";
+
+
 
 type QRScannerProps = {
     onRead: (data: string | null | undefined) => void;

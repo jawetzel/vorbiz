@@ -6,7 +6,10 @@ export type ProjectRouteParams = {
 export type RootStackParamList = {
     Home: undefined;
     LocationDetail: ProjectRouteParams;
-    ProductDetail: ProjectRouteParams;
+    ProductDetail: {
+        id?: string | null; // id is optional in case it's not provided
+        showQrCode?: boolean;
+    };
     Locations: undefined;
     Products: undefined;
     SaleHome: {

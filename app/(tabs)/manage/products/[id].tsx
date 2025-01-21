@@ -20,7 +20,10 @@ import DeleteButton from "@/components/ui/buttons/delete-button";
 import SaveButton from "@/components/ui/buttons/save-button";
 import {themeColors} from "@/components/ui/theme-colors";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import LocationModel from "@/services/local-data/models/location-model";
+import QRCodeGenerator from "@/app/(tabs)/manage/products/qr-generator";
+
+
+
 
 type ProductDetailScreenNavigationProp = NativeStackNavigationProp<
     RootStackParamList,
@@ -33,7 +36,7 @@ export default function ProductDetailScreen() {
     const navigation = useNavigation<ProductDetailScreenNavigationProp>();
     const route = useRoute<ProductDetailScreenRouteProp>();
 
-    const { id } = route.params || {};
+    const { id, showQrCode } = route.params || {};
     const [loading, setLoading] = useState(true);
     const [variantModalVisible, setVariantModalVisible] = useState(false);
     const [variantModalId, setVariantModalId] = useState<string | null>(null);
@@ -97,6 +100,7 @@ export default function ProductDetailScreen() {
 
         loadProduct();
     }, [id, database]);
+
 
     const toggleSection = (section: string) => {
         setCollapsedSections(prevState => ({
@@ -348,8 +352,25 @@ export default function ProductDetailScreen() {
         );
     }
 
+
+
+
+
+
+
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
+            {showQrCode && product.upc && product.upc.length === 12 &&
+                <View style={styles.group}>
+                    <QRCodeGenerator upc={product.upc} />
+                </View>
+            }
+            {showQrCode && (!product.upc || product.upc.length !== 12) &&
+                <View style={styles.group}>
+                    <Text style={styles.QRCodeFailureText}>Please provide a 12 digit number UPC to download a QR code</Text>
+                </View>
+            }
             {/* Modal Component */}
             {variantModalVisible && id &&
                 <ProductVariantModal
@@ -484,4 +505,10 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '600',
     },
+    QRCodeFailureText: {
+        margin: 8,
+        color: themeColors.danger,
+        fontSize: 16,
+        fontWeight: '500',
+    }
 });

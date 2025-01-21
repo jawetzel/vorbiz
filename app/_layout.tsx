@@ -64,9 +64,35 @@ function ManageStackNavigator() {
         />
           <ManageStack.Screen name="Reporting" component={ReportingScreen} />
           <ManageStack.Screen name="Locations" component={LocationScreen} />
-          <ManageStack.Screen name="LocationDetail" component={LocationDetailScreen} />
+          <ManageStack.Screen name="LocationDetail" component={LocationDetailScreen}/>
           <ManageStack.Screen name="Products" component={ProductsScreen} />
-          <ManageStack.Screen name="ProductDetail" component={ProductDetailScreen} />
+          <ManageStack.Screen name="ProductDetail" component={ProductDetailScreen}
+                              initialParams={{ showQrCode: false }}
+                              options={({ navigation, route }: {
+                                  navigation: NativeStackNavigationProp<ParamListBase, string>;
+                                  route: RouteProp<ParamListBase, string>;
+                                  theme: Theme;
+                              }) => ({
+                                  headerRight: () => (
+                                      <TouchableOpacity
+                                          style={{
+                                              padding: 8,
+                                              paddingHorizontal: 15,
+                                              backgroundColor: themeColors.primary,
+                                              borderRadius: 4,
+                                              borderWidth: .5,
+                                              borderColor: 'white',
+                                          }}
+                                          onPressIn={() => {
+                                              const currentToggleValue = (route.params as RootStackParamList['ProductDetail'])?.showQrCode || false;
+                                              navigation.setParams({ showQrCode: !currentToggleValue });
+                                          }}
+                                      >
+                                          <FontAwesomeIcon icon={faQrcode} size={24} color={themeColors.backgroundThree} />
+                                      </TouchableOpacity>
+                                  ),
+                              })}
+          />
       </ManageStack.Navigator>
   );
 }
@@ -77,7 +103,7 @@ function SalesStackNavigator() {
             <ManageStack.Screen
                 name="SaleHome"
                 component={SaleScreen}
-                initialParams={{ toggleQRScanner: false }} // Add default params
+                initialParams={{ toggleQRScanner: false }}
                 options={({ navigation, route }: {
                     navigation: NativeStackNavigationProp<ParamListBase, string>;
                     route: RouteProp<ParamListBase, string>;
