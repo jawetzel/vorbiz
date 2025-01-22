@@ -4,7 +4,7 @@ import {themeColors} from "@/components/ui/theme-colors";
 
 
 const InputError = ({error}: {error:  string | undefined}) => {
-    return <> {error ? <Text style={styles.error}>{error}</Text> : null} </>
+    return error ? <Text style={styles.error}>{error}</Text> : null;
 }
 const styles = StyleSheet.create({
     error: {
