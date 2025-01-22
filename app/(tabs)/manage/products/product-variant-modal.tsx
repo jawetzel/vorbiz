@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import {View, Modal, Text, StyleSheet, Alert} from 'react-native';
 import ProductVariantModel from "@/services/local-data/models/product-variant-model";
 import {useDatabase} from "@nozbe/watermelondb/hooks";
-import InputField from "@/components/ui/input-field";
+import InputField from "@/components/ui/inputs/input-field";
 import DeleteButton from "@/components/ui/buttons/delete-button";
 import SaveButton from "@/components/ui/buttons/save-button";
 import CancelButton from "@/components/ui/buttons/cancel-button";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 import ProductModel from "@/services/local-data/models/product-model";
 
 interface CreateProductVariantModalProps {

@@ -1,6 +1,6 @@
 import {Button, StyleSheet, View} from "react-native";
 import React from "react";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 
 
 type SaveButtonProps = {

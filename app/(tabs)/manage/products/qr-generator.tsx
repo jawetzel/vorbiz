@@ -3,7 +3,7 @@ import React, {useRef} from "react";
 import * as MediaLibrary from 'expo-media-library';
 import QRCode from 'react-native-qrcode-svg';
 import RNFS from "react-native-fs";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 
 type QRGeneratorProps = {
     upc: string;

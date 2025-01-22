@@ -1,4 +1,4 @@
-import {InputTypeDropdownOption} from "@/components/ui/input-field";
+import {InputTypeDropdownOption} from "@/components/ui/inputs/input-field";
 import {usaStatesWithCounties} from "typed-usa-states";
 
 export const LoadCountyParishDropdownOptions = (value: string | null) => {

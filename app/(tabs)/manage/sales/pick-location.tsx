@@ -7,7 +7,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {useDatabase} from "@nozbe/watermelondb/hooks";
 import {useFocusEffect} from "@react-navigation/native";
 import LocationModel from "@/services/local-data/models/location-model";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
 import {faMap, faPlusSquare} from "@fortawesome/free-regular-svg-icons";
 

@@ -22,7 +22,7 @@ import LocationScreen from "@/app/(tabs)/manage/locations/index";
 import LocationDetailScreen from "@/app/(tabs)/manage/locations/[id]";
 import ProductsScreen from "@/app/(tabs)/manage/products";
 import ProductDetailScreen from "@/app/(tabs)/manage/products/[id]";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 import SaleScreen from "@/app/(tabs)/manage/sales";
 import {TouchableOpacity, Text} from "react-native";
 import {RootStackParamList} from "@/models/ProjectRouteParams";

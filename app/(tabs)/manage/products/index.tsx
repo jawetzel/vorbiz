@@ -15,7 +15,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {RootStackParamList} from "@/models/ProjectRouteParams";
 import ProductModel from "@/services/local-data/models/product-model";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 
 type ListScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ProductDetail'>;
 

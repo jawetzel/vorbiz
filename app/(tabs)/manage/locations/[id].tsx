@@ -11,12 +11,13 @@ import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
 import LocationModel, {LocationErrors} from "@/services/local-data/models/location-model";
 import {ProjectRouteParams} from "@/models/ProjectRouteParams";
 import Loader from "@/components/ui/loader";
-import InputField, {InputTypeDropdownOption} from "@/components/ui/input-field";
+import InputField from "@/components/ui/inputs/input-field";
 import DeleteButton from "@/components/ui/buttons/delete-button";
 import SaveButton from "@/components/ui/buttons/save-button";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 import { usaStatesWithCounties } from 'typed-usa-states';
 import {LoadCountyParishDropdownOptions} from "@/constants/LocationConstants";
+import {InputTypeDropdownOption} from "@/components/ui/inputs/input-typings";
 
 export default function LocationDetailScreen() {
     const database = useDatabase();

@@ -2,7 +2,7 @@ import {Button, View, Text, StyleSheet} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {RootStackParamList} from "@/models/ProjectRouteParams";
-import {themeColors} from "@/components/ui/theme-colors";  // Import the navigation hook
+import {themeColors} from "@/constants/theme-colors";  // Import the navigation hook
 
 
 type ListScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;

@@ -1,6 +1,6 @@
 import {StyleSheet, Text} from "react-native";
 import React from "react";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 
 
 const InputError = ({error}: {error:  string | undefined}) => {

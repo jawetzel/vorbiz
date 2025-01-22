@@ -18,7 +18,7 @@ import ProductVariantModel from "@/services/local-data/models/product-variant-mo
 import SaleModel from "@/services/local-data/models/sale-model";
 import SaleLineModel from "@/services/local-data/models/sale-line-model";
 
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 
 import {RootStackParamList} from "@/models/ProjectRouteParams";
 import LocationPickerModal from "@/app/(tabs)/manage/sales/pick-location";

@@ -7,7 +7,7 @@ import {
     Platform,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
 import SaleLineModel from "@/services/local-data/models/sale-line-model";
 import database from "@/services/local-data/context";
 

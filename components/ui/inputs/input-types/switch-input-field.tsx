@@ -1,7 +1,8 @@
 import {StyleSheet, Switch, Text, View} from "react-native";
 import React from "react";
 import InputError from "@/components/ui/inputs/input-error";
-import {CommonInputStyles, InputFieldProps} from "@/components/ui/input-field";
+import {InputFieldProps} from "@/components/ui/inputs/input-typings";
+import {CommonInputStyles} from "@/components/ui/inputs/input-styles";
 
 const SwitchInputField: React.FC<InputFieldProps> = ({
                                                     title,

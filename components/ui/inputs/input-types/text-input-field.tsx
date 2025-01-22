@@ -2,10 +2,11 @@ import {KeyboardTypeOptions, StyleSheet, Text, TextInput, TouchableWithoutFeedba
 import React, {useRef} from "react";
 import {InputFieldTypes} from "@/models/constants";
 import InputError from "@/components/ui/inputs/input-error";
-import {CommonInputStyles, InputDecorators, InputFieldProps} from "@/components/ui/input-field";
-import {themeColors} from "@/components/ui/theme-colors";
+import {themeColors} from "@/constants/theme-colors";
+import {InputFieldProps} from "@/components/ui/inputs/input-typings";
+import {CommonInputStyles} from "@/components/ui/inputs/input-styles";
 
-const NumberInputField: React.FC<InputFieldProps> = ({
+const TextInputField: React.FC<InputFieldProps> = ({
                                                     title,
                                                    inputType,
                                                     fieldName,
@@ -13,7 +14,7 @@ const NumberInputField: React.FC<InputFieldProps> = ({
                                                     handleChange,
                                                    error
                                                 }) => {
-    const inputRef = useRef<TextInput | null>(null);
+    const inputRef = useRef<TextInput | null>(null); // Reference to the input
 
     let keyboardType = "default" as KeyboardTypeOptions;
     if(inputType){
@@ -44,57 +45,35 @@ const NumberInputField: React.FC<InputFieldProps> = ({
         }
     }
 
-
     return <TouchableWithoutFeedback
-        onPress={() => inputRef.current?.focus()}
+        onPress={() => inputRef.current?.focus()} // Focus input when tapped
     >
         <View style={CommonInputStyles.fieldContainer}>
             {title && title.length > 0 ? <Text style={CommonInputStyles.label}>{title}</Text> : null}
             <View style={styles.textInputContainer}>
-                {inputType && InputDecorators.money === inputType &&
-                    <View style={styles.percentContainer}>
-                        <Text style={styles.percentText}>$</Text>
-                    </View>
-                }
                 <TextInput
                     ref={inputRef}
+                    keyboardType={keyboardType}
                     style={styles.input}
                     value={String(value)}
-                    keyboardType={keyboardType}
-                    onChangeText={(text) => {
-                        if (/^(\d+(\.\d*)?|\.\d*)?$/.test(text)) {
-                            handleChange(fieldName, text);
-                        }
-                    }}
-                    onBlur={() => {
-                        const currentValue = value;
-                        if (typeof currentValue === 'string') {
-                            const numericValue = parseFloat(currentValue);
-                            handleChange(fieldName, isNaN(numericValue) ? 0 : numericValue);
-                        }
-                    }}
+                    onChangeText={(text) => handleChange(fieldName, text)}
                 />
-                {inputType && InputDecorators.percentage === inputType &&
-                    <View style={styles.percentContainer}>
-                        <Text style={styles.percentText}>%</Text>
-                    </View>
-                }
             </View>
             <InputError error={error} />
         </View>
     </TouchableWithoutFeedback>
+
 }
 
 const styles = StyleSheet.create({
     input: {
         flex: 1,
         marginBottom: 0,
-        paddingVertical: 4,
-        paddingHorizontal: 8,
-        minHeight: 25,
-        fontSize: 14,
+        paddingVertical: 4, // Ensures consistent vertical spacing
+        paddingHorizontal: 8, // Padding for left and right
+        minHeight: 25, // Ensures a visible height
+        fontSize: 14, // Readable text size
     },
-
     textInputContainer: {
         flexDirection: 'row',
         borderWidth: 1,
@@ -102,20 +81,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         height: 40,
         minHeight: 40,
-    },
-    percentContainer: {
-        backgroundColor: themeColors.borders,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 10,
-        borderLeftWidth: 1,
-        borderLeftColor: themeColors.borders,
-    },
-    percentText: {
-        color: '#666',
-        fontSize: 16,
-    },
-
+    }
 });
 
-export default NumberInputField;
+export default TextInputField;

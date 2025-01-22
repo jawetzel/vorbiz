@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View} from "react-native";
 import React from "react";
 import {Picker} from "@react-native-picker/picker";
-import {CommonInputStyles, InputFieldProps} from "@/components/ui/input-field";
 import InputError from "@/components/ui/inputs/input-error";
+import {InputFieldProps} from "@/components/ui/inputs/input-typings";
+import {CommonInputStyles} from "@/components/ui/inputs/input-styles";
 
 
 const DropdownInputField: React.FC<InputFieldProps> = ({
