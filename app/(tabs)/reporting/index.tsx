@@ -8,14 +8,27 @@ import {
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {themeColors} from "@/constants/theme-colors";
-import SaleLineModel from "@/services/local-data/models/sale-line-model";
+import SaleLineModel, {
+    groupAggregatedSalesByLocation,
+    groupAggregatedSalesByProduct,
+    LocationGroupedAggregatedSaleLineModel,
+    ProductGroupedAggregatedSaleLineModel, SaleAggregationTotals,
+    totalAggregatedSales
+} from "@/services/local-data/models/sale-line-model";
 import database from "@/services/local-data/context";
+import SalesReport from "@/app/(tabs)/reporting/sales-report";
 
 
 const ReportingScreen = () => {
     const [startDate, setStartDate] = useState(new Date());
     const [show, setShow] = useState(false);
-
+    const [showReport, setShowReport] = useState(false);
+    const [salesGroupedByLocation, setSalesGroupedByLocation] =
+        useState<LocationGroupedAggregatedSaleLineModel[]>([])
+    const [salesGroupedByProduct, setSalesGroupedByProduct] =
+        useState<ProductGroupedAggregatedSaleLineModel[]>([])
+    const [salesTotals, setSalesTotals] =
+        useState<SaleAggregationTotals>({} as SaleAggregationTotals)
     const formatDisplayDate = (date: Date): string => {
         const options: Intl.DateTimeFormatOptions = {
             weekday: 'long',
@@ -40,15 +53,17 @@ const ReportingScreen = () => {
         const dayStart = dateUtils.getStartOfDay(startDate);
         var dayEnd = dateUtils.getEndOfDay(startDate);
         const reportData = await SaleLineModel.aggregatedSalesByDateRange(database, dayStart, dayEnd);
-        console.log(reportData);
+
+        setShowReport(true);
+        setSalesGroupedByLocation(await groupAggregatedSalesByLocation(reportData));
+        setSalesGroupedByProduct(await groupAggregatedSalesByProduct(reportData));
+        setSalesTotals(await totalAggregatedSales(reportData));
+
     }
 
 
     return (
         <View style={styles.container}>
-            <Text>Reporting</Text>
-
-            <Text>End of Day Report</Text>
             <TouchableOpacity
                 onPress={showDatepicker}
                 style={[
@@ -83,6 +98,14 @@ const ReportingScreen = () => {
                 </Text>
             </TouchableOpacity>
 
+            {showReport &&
+                <SalesReport
+                    locationGroupedData={salesGroupedByLocation}
+                    productGroupedData={salesGroupedByProduct}
+                    totals={salesTotals}
+                />
+            }
+
 
         </View>
     );
@@ -91,6 +114,7 @@ const ReportingScreen = () => {
 const styles = StyleSheet.create({
     container: {
         padding: 10,
+        height: '100%'
     },
     button: {
         padding: 15,

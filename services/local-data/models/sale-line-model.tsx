@@ -6,6 +6,9 @@ import SaleModel from "@/services/local-data/models/sale-model";
 import LocationModel from "@/services/local-data/models/location-model";
 import ProductModel from "@/services/local-data/models/product-model";
 import _ from 'lodash';
+import ProductVariantModal from "@/app/(tabs)/manage/products/product-variant-modal";
+import ProductVariantModel from "@/services/local-data/models/product-variant-model";
+import productVariantModal from "@/app/(tabs)/manage/products/product-variant-modal";
 
 type modelT = SaleLineModel;
 
@@ -74,9 +77,9 @@ export default class SaleLineModel extends Model {
         database: Database,
         startTimestamp: number,
         endTimestamp: number
-    ): Promise<SaleLine[]> {
+    ): Promise<SaleLineViewModel[]> {
             try {
-                // 1. Get all sales for the date range
+
                 let sales = await database.collections.get('sales')
                     .query(
                         Q.and(
@@ -86,8 +89,13 @@ export default class SaleLineModel extends Model {
                     )
                     .fetch() as SaleModel[];
                 sales = sales.filter(sale => sale.location_id);
-                console.log('sales', sales);
-                // 2. Get all unique location IDs from sales and fetch locations in one query
+                const saleIds = sales
+                    .map(sale => sale.id)
+                    .filter((id): id is string => id !== null && id !== undefined);
+                const saleMap = new Map(sales
+                    .map(sale => [sale.id, sale]));
+
+
                 const locationIds = [...new Set(
                     sales
                         .map(sale => sale.location_id)
@@ -98,18 +106,17 @@ export default class SaleLineModel extends Model {
                         Q.where('id', Q.oneOf(locationIds))
                     )
                     .fetch() as LocationModel[];
+                const locationMap = new Map(locations
+                    .map(loc => [loc.id, loc]));
 
-                // 3. Get all sale lines for these sales in one query
-                const saleIds = sales
-                    .map(sale => sale.id)
-                    .filter((id): id is string => id !== null && id !== undefined);
+
                 const saleLines = await database.collections.get('saleLines')
                     .query(
                         Q.where('sale_id', Q.oneOf(saleIds))
                     )
                     .fetch() as SaleLineModel[];
 
-                // 4. Get all products for these sale lines in one query
+
                 const productIds = [...new Set(
                     saleLines
                         .map(line => line.product_id)
@@ -120,13 +127,25 @@ export default class SaleLineModel extends Model {
                         Q.where('id', Q.oneOf(productIds))
                     )
                     .fetch() as ProductModel[];
+                const productMap = new Map(products
+                    .map(prod => [prod.id, prod]));
 
-                // 5. Create lookup maps for faster access
-                const locationMap = new Map(locations.map(loc => [loc.id, loc]));
-                const productMap = new Map(products.map(prod => [prod.id, prod]));
-                const saleMap = new Map(sales.map(sale => [sale.id, sale]));
+                // 5. Get all products for these sale lines in one query
+                const productVariantIds = [...new Set(
+                    saleLines
+                        .map(line => line.productVariant_id)
+                        .filter((id): id is string => id !== null && id !== undefined)
+                )];
+                const productVariants = await database.collections.get('productVariants')
+                    .query(
+                        Q.where('id', Q.oneOf(productVariantIds))
+                    )
+                    .fetch() as ProductVariantModel[];
+                const productVariantMap = new Map(productVariants
+                    .map(prod => [prod.id, prod]));
 
-                // 6. Build final report data
+
+
                 const reportData = saleLines.map(line => {
                     // Check that we have a valid sale_id before lookup
                     if (!line.sale_id) {
@@ -155,18 +174,21 @@ export default class SaleLineModel extends Model {
                         throw new Error(`Could not find product for id ${line.product_id}`);
                     }
 
+                    let productVariant = null;
+                    if (line.productVariant_id) {
+                        productVariant = productVariantMap.get(line.productVariant_id);
+                        if(!productVariant) {
+                            throw new Error(`Could not find product variant for id ${line.productVariant_id}`);
+                        }
+                    }
+
                     return {
-                        saleDate: sale.saleDate,
-                        locationName: location.name,
-                        location_id: location.id,
-                        productName: product.name,
-                        product_id: product.id,
-                        qty: line.qty,
-                        subtotal: line.subtotal,
-                        countyParishTaxAmount: line.countyParishTaxAmount,
-                        stateTaxAmount: line.stateTaxAmount,
-                        total: line.total
-                    } as SaleLine;
+                        sale: sale,
+                        location: location,
+                        product: product,
+                        line: line,
+                        variant: productVariant
+                    } as SaleLineViewModel;
                 });
                 return reportData;
 
@@ -184,30 +206,29 @@ export default class SaleLineModel extends Model {
         endTimestamp: number
     ): Promise<AggregatedSaleLine[]> {
         try {
-            // Get detailed sale lines
             const saleLines = await this.saleLinesByDateRange(database, startTimestamp, endTimestamp);
 
-            // Group by location and product
             const groupedSales = _.groupBy(saleLines, line =>
-                `${line.location_id}|${line.product_id}`
+                `${line.location.id}|${line.product.id}|${line.variant?.id || ""}`
             );
 
-            // Aggregate the groups
             const aggregatedData = Object.values(groupedSales).map(group => {
-                const { locationName, productName} = group[0];
+                const { location, product, variant} = group[0];
 
                 return {
-                    locationName,
-                    productName,
-                    totalQty: _.sumBy(group, 'qty'),
-                    totalSubtotal: _.sumBy(group, 'subtotal'),
-                    totalCountyParishTax: _.sumBy(group, 'countyParishTaxAmount'),
-                    totalStateTax: _.sumBy(group, 'stateTaxAmount'),
-                    totalAmount: _.sumBy(group, 'total')
+                    locationName: location.name,
+                    location: location,
+                    productName: product.name,
+                    product: product,
+                    variant: variant,
+                    totalQty: _.sumBy(group, 'line.qty'),
+                    totalSubtotal: _.sumBy(group, 'line.subtotal'),
+                    totalCountyParishTax: _.sumBy(group, 'line.countyParishTaxAmount'),
+                    totalStateTax: _.sumBy(group, 'line.stateTaxAmount'),
+                    totalAmount: _.sumBy(group, 'line.total')
                 } as AggregatedSaleLine;
             });
-
-            // Sort by location name and then product name
+            console.log(aggregatedData);
             return _.orderBy(aggregatedData, ['locationName', 'productName']);
 
         } catch (error) {
@@ -215,24 +236,95 @@ export default class SaleLineModel extends Model {
             throw error;
         }
     };
+
 }
 
-interface SaleLine {
-    saleDate: number;
-    locationName: string;
-    location_id: string;
-    productName: string;
-    product_id: string;
-    qty: number;
-    subtotal: number;
-    countyParishTaxAmount: number;
-    stateTaxAmount: number;
-    total: number;
+export const groupAggregatedSalesByLocation = async  (
+    aggregatedSales: AggregatedSaleLine[]
+): Promise<LocationGroupedAggregatedSaleLineModel[]> => {
+    const groupedSales = _.groupBy(aggregatedSales, line =>
+        line.location.id
+    );
+
+    const aggregatedData = Object.values(groupedSales).map(group => {
+        const { location} = group[0];
+        return {
+            locationName: location.name,
+            location: location,
+            aggregatedSales: group
+        } as LocationGroupedAggregatedSaleLineModel;
+    });
+
+    return _.orderBy(aggregatedData, ['locationName']);
+};
+export const groupAggregatedSalesByProduct = async  (
+    aggregatedSales: AggregatedSaleLine[]
+): Promise<ProductGroupedAggregatedSaleLineModel[]> => {
+
+    const groupedSales = _.groupBy(aggregatedSales, line =>
+        `${line.product.id}|${line.variant?.id || ""}`
+    );
+
+    const aggregatedData = Object.values(groupedSales).map(group => {
+        const { product, variant} = group[0];
+        return {
+            product: product,
+            variant: variant,
+            aggregatedSales: group
+        } as ProductGroupedAggregatedSaleLineModel;
+    });
+
+    return _.orderBy(aggregatedData, ['locationName']);
+};
+
+export const totalAggregatedSales = async  (
+    aggregatedSales: AggregatedSaleLine[]
+): Promise<SaleAggregationTotals> => {
+
+    const totals = aggregatedSales.reduce((acc, curr) => {
+        return {
+            totalSubtotal: acc.totalSubtotal + curr.totalSubtotal,
+            totalTax: acc.totalTax + curr.totalCountyParishTax + curr.totalStateTax,
+            totalAmount: acc.totalAmount + curr.totalAmount,
+            totalQty: acc.totalQty + curr.totalQty
+        };
+    }, { totalSubtotal: 0, totalTax: 0, totalAmount: 0, totalQty: 0 } as SaleAggregationTotals);
+
+    return totals;
+};
+
+export interface LocationGroupedAggregatedSaleLineModel {
+    locationName: string,
+    location: LocationModel,
+    aggregatedSales: AggregatedSaleLine[]
+}
+export interface ProductGroupedAggregatedSaleLineModel {
+    product: ProductModel,
+    variant: ProductVariantModel,
+    aggregatedSales: AggregatedSaleLine[]
 }
 
-interface AggregatedSaleLine {
+export interface SaleLineViewModel {
+    sale: SaleModel,
+    location: LocationModel,
+    product: ProductModel,
+    variant?: ProductVariantModel,
+    line: SaleLineModel,
+
+}
+export interface SaleAggregationTotals {
+    totalQty: number;
+    totalSubtotal: number;
+    totalTax: number;
+    totalAmount: number;
+}
+
+export interface AggregatedSaleLine {
     locationName: string;
+    location: LocationModel;
     productName: string;
+    product: ProductModel;
+    variant: ProductVariantModel;
     totalQty: number;
     totalSubtotal: number;
     totalCountyParishTax: number;
