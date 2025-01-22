@@ -10,7 +10,8 @@ export default class LocationModel extends Model {
         { name: 'name', type: 'string' },
         { name: 'address', type: 'string' },
         { name: 'city', type: 'string' },
-        { name: 'state', type: 'string' },
+        { name: 'state', type: 'string', inputType: InputFieldTypes.dropdown },
+        { name: 'countyParish', type: 'string', inputType: InputFieldTypes.dropdown},
         { name: 'zipCode', type: 'string', inputType: InputFieldTypes.numeric },
         { name: 'countyParishTaxZone', type: 'string' },
         { name: 'countyParishTaxRate', type: 'number', inputType: InputFieldTypes.percent},
@@ -35,6 +36,7 @@ export default class LocationModel extends Model {
     @text('address') address!: string;
     @text('city') city!: string;
     @text('state') state!: string;
+    @text('countyParish') countyParish!: string;
     @text('zipCode') zipCode!: string;
     @text('countyParishTaxZone') countyParishTaxZone!: string;
     @field('countyParishTaxRate') countyParishTaxRate!: number;

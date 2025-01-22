@@ -4,5 +4,6 @@ export const InputFieldTypes = {
     phone: 'phone',
     email: 'email',
     numeric: 'numeric',
-    decimal: 'decimal'
+    decimal: 'decimal',
+    dropdown: 'dropdown'
 }

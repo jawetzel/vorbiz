@@ -31,6 +31,6 @@ const tables = generateSchemaFromModels([
 
 // model/schema.js
 export const mySchema = appSchema({
-    version: 8,
+    version: 9,
     tables: tables
 })

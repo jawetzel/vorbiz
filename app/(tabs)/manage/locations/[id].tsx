@@ -11,24 +11,35 @@ import {useRoute, useNavigation, RouteProp} from '@react-navigation/native';
 import LocationModel, {LocationErrors} from "@/services/local-data/models/location-model";
 import {ProjectRouteParams} from "@/models/ProjectRouteParams";
 import Loader from "@/components/ui/loader";
-import InputField from "@/components/ui/input-field";
+import InputField, {InputTypeDropdownOption} from "@/components/ui/input-field";
 import DeleteButton from "@/components/ui/buttons/delete-button";
 import SaveButton from "@/components/ui/buttons/save-button";
 import {themeColors} from "@/components/ui/theme-colors";
-import {Loc} from "sucrase/dist/types/parser/traverser/base";
+import { usaStatesWithCounties } from 'typed-usa-states';
+import {LoadCountyParishDropdownOptions} from "@/constants/LocationConstants";
 
 export default function LocationDetailScreen() {
     const database = useDatabase();
     const navigation = useNavigation();
     const route = useRoute<RouteProp<{ params: ProjectRouteParams }, 'params'>>();
     const {id} = route.params || {};
-
+    const [dropdownOptions, setDropdownOptions] =
+        useState<Record<string, InputTypeDropdownOption[]>>({
+            'state': usaStatesWithCounties.map(state => {
+                return {
+                    id: state.abbreviation,
+                    name: state.abbreviation
+                } as InputTypeDropdownOption
+            }),
+            'countyParish': [],
+        });
     const [loading, setLoading] = useState(true);
     const [location, setLocation] = useState<LocationModel>({
         name: '',
         address: '',
         city: '',
         state: '',
+        countyParish: '',
         zipCode: '',
         countyParishTaxZone: '',
         countyParishTaxRate: 0.0,
@@ -56,6 +67,7 @@ export default function LocationDetailScreen() {
                             city: fetchedLocation.city || '',
                             state: fetchedLocation.state || '',
                             zipCode: fetchedLocation.zipCode || '',
+                            countyParish: fetchedLocation.countyParish || '',
                             countyParishTaxZone: fetchedLocation.countyParishTaxZone || '',
                             countyParishTaxRate: fetchedLocation.countyParishTaxRate || 0.0,
                             stateTaxRate: fetchedLocation.stateTaxRate || 0.0,
@@ -64,6 +76,10 @@ export default function LocationDetailScreen() {
                             contactName: fetchedLocation.contactName || '',
                         } as LocationModel);
                     }
+                    setDropdownOptions(prevState => ({
+                        ...prevState,
+                        ['countyParish']: LoadCountyParishDropdownOptions(fetchedLocation.state),
+                    }));
                 } catch (error) {
                     console.error('Error loading location:', error);
                     Alert.alert('Error', 'Unable to load location.');
@@ -130,6 +146,12 @@ export default function LocationDetailScreen() {
             ...prev,
             [field]: parsedValue,
         } as LocationModel));
+        if(field === 'state' && (value === null || typeof value === 'string')){
+            setDropdownOptions(prevState => ({
+                ...prevState,
+                ['countyParish']: LoadCountyParishDropdownOptions(value),
+            }));
+        }
     };
 
     const handleDelete = () => {
@@ -167,6 +189,21 @@ export default function LocationDetailScreen() {
             <Loader/>
         );
     }
+    const fieldDisplayNames: Record<string, string> = {
+        name: 'Location Name',
+        contactName: 'Contact Name',
+        phone: 'Phone Number',
+        email: 'Email Address',
+        state: 'State',
+        countyParish: 'County/Parish',
+        countyParishTaxZone: 'County/Parish Tax Zone',
+        countyParishTaxRate: 'County/Parish Tax Rate',
+        stateTaxRate: 'State Tax Rate',
+        address: 'Street Address',
+        city: 'City',
+        zipCode: 'ZIP Code'
+
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -178,16 +215,18 @@ export default function LocationDetailScreen() {
                 </View>
                 {[
                     'name',
-                    'address', 'city', 'state', 'zipCode',
-                    'phone', 'email',
                     'contactName',
-                    'countyParishTaxZone', 'countyParishTaxRate', 'stateTaxRate'
+                    'phone', 'email',
+                    'state', 'countyParish',
+                    'countyParishTaxZone', 'countyParishTaxRate', 'stateTaxRate',
+                    'address', 'city', 'zipCode'
                 ].map((field) => {
                     return <View key={'locations_' + field} style={styles.sectionContent}>
                         <InputField
-                            title={field.charAt(0).toUpperCase() + field.slice(1)}
+                            title={fieldDisplayNames[field]}
                             fieldType={LocationModel.GetColumnType(field)}
                             inputType={LocationModel.GetInputType(field)}
+                            dropdownOptions={dropdownOptions[field]}
                             fieldName={field}
                             value={location[field as keyof LocationErrors]}
                             handleChange={handleChange}
