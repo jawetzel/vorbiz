@@ -4,9 +4,7 @@ import {
     Text,
     TouchableOpacity,
     StyleSheet,
-    Platform,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { themeColors } from "@/constants/theme-colors";
 import SaleLineModel, {
     groupAggregatedSalesByLocation,
@@ -17,13 +15,12 @@ import SaleLineModel, {
 } from "@/services/local-data/models/sale-line-model";
 import database from "@/services/local-data/context";
 import SalesReport from "@/app/(tabs)/reporting/sales-report";
-import {faCalendar, faChevronDown, faQrcode} from '@fortawesome/free-solid-svg-icons'; // Import the icons you want to use
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import {getEndOfDay, getStartOfDay} from "@/utils/date-utils";
+import DatePicker from "@/components/ui/inputs/input-types/date-picker-input";
 
 const OneDayReport = () => {
     const [startDate, setStartDate] = useState(new Date());
-    const [show, setShow] = useState(false);
+    const [reportDate, setReportDate] = useState<Date | null>(null);
     const [showReport, setShowReport] = useState(false);
     const [salesGroupedByLocation, setSalesGroupedByLocation] =
         useState<LocationGroupedAggregatedSaleLineModel[]>([]);
@@ -32,31 +29,13 @@ const OneDayReport = () => {
     const [salesTotals, setSalesTotals] =
         useState<SaleAggregationTotals>({} as SaleAggregationTotals);
 
-    const formatDisplayDate = (date: Date): string => {
-        const options: Intl.DateTimeFormatOptions = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        };
-        return date.toLocaleDateString('en-US', options);
-    };
-
-    const onChange = (event: any, selectedDate?: Date) => {
-        const currentDate = selectedDate || startDate;
-        setShow(Platform.OS === 'ios');
-        setStartDate(currentDate);
-    };
-
-    const showDatepicker = () => {
-        setShow(true);
-    };
 
     const EndOfDayReport = async () => {
         const dayStart = getStartOfDay(startDate);
         var dayEnd = getEndOfDay(startDate);
         const reportData = await SaleLineModel.aggregatedSalesByDateRange(database, dayStart, dayEnd);
 
+        setReportDate(startDate);
         setShowReport(true);
         setSalesGroupedByLocation(await groupAggregatedSalesByLocation(reportData));
         setSalesGroupedByProduct(await groupAggregatedSalesByProduct(reportData));
@@ -71,23 +50,10 @@ const OneDayReport = () => {
             </View>
 
             <View style={styles.dateSection}>
-                <TouchableOpacity
-                    onPress={showDatepicker}
-                    style={styles.dateButton}
-                >
-                    <View style={styles.dateButtonContent}>
-                        <Text style={styles.iconContainer}>
-                            <FontAwesomeIcon icon={faCalendar} size={24} color={themeColors.secondary} />
-                        </Text>
-                        <View style={styles.dateTextContainer}>
-                            <Text style={styles.dateLabel}>Selected Date</Text>
-                            <Text style={styles.dateValue}>{formatDisplayDate(startDate)}</Text>
-                        </View>
-                        <Text style={styles.iconContainer}>
-                            <FontAwesomeIcon icon={faChevronDown} size={24} color={themeColors.secondary} />
-                        </Text>
-                    </View>
-                </TouchableOpacity>
+                <DatePicker
+                    selectedDate={startDate}
+                    onDateChange={setStartDate}
+                />
 
                 <TouchableOpacity
                     onPress={EndOfDayReport}
@@ -97,22 +63,13 @@ const OneDayReport = () => {
                 </TouchableOpacity>
             </View>
 
-            {show && (
-                <DateTimePicker
-                    testID="dateTimePicker"
-                    value={startDate}
-                    mode="date"
-                    display="default"
-                    onChange={onChange}
-                />
-            )}
-
             {showReport && (
                 <View style={styles.reportContainer}>
                     <SalesReport
                         locationGroupedData={salesGroupedByLocation}
                         productGroupedData={salesGroupedByProduct}
                         totals={salesTotals}
+                        title={`${reportDate?.toLocaleDateString()} Report`}
                     />
                 </View>
             )}
@@ -126,7 +83,8 @@ const styles = StyleSheet.create({
         backgroundColor: themeColors.background,
     },
     headerContainer: {
-        padding: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
         backgroundColor: themeColors.backgroundThree,
         borderBottomWidth: 1,
         borderBottomColor: themeColors.borders,
@@ -142,48 +100,8 @@ const styles = StyleSheet.create({
         color: themeColors.textLight,
     },
     dateSection: {
-        padding: 16,
-        gap: 16,
-    },
-    dateButton: {
-        backgroundColor: themeColors.backgroundThree,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: themeColors.borders,
         padding: 12,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
-    },
-    dateButtonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    iconContainer: {
-        width: 24,
-        height: 24,
-        textAlign: 'center',
-        textAlignVertical: 'center',
-    },
-    dateTextContainer: {
-        flex: 1,
-        marginHorizontal: 12,
-    },
-    dateLabel: {
-        fontSize: 14,
-        color: themeColors.textLight,
-        marginBottom: 2,
-    },
-    dateValue: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: themeColors.text,
+        gap: 8,
     },
     runReportButton: {
         backgroundColor: themeColors.primaryTwo,

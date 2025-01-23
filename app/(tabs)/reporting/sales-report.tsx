@@ -10,15 +10,18 @@ interface Props {
     locationGroupedData: LocationGroupedAggregatedSaleLineModel[];
     productGroupedData: ProductGroupedAggregatedSaleLineModel[];
     totals: SaleAggregationTotals;
+    title: string;
 }
 
 const SalesReport: React.FC<Props> = ({
                                           locationGroupedData,
                                           productGroupedData,
-                                          totals
+                                          totals,
+                                            title
                                       }) => {
     return (
         <ScrollView style={styles.container}>
+            <Text style={styles.reportTitle}>{title}</Text>
             {/* Sales by Location Section */}
             <View style={styles.sectionCard}>
                 <View style={styles.totalsSectionHeader}>
@@ -166,7 +169,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: themeColors.background,
-        paddingTop: 24,
+        paddingTop: 12,
+    },
+    reportTitle: {
+        fontSize: 24,
+        fontWeight: '600',
+        marginBottom: 12
     },
     totalsSectionHeader: {
         backgroundColor: themeColors.primary,

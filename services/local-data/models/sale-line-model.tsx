@@ -198,8 +198,6 @@ export default class SaleLineModel extends Model {
             }
     };
 
-
-
     static async  aggregatedSalesByDateRange(
         database: Database,
         startTimestamp: number,
@@ -228,7 +226,6 @@ export default class SaleLineModel extends Model {
                     totalAmount: _.sumBy(group, 'line.total')
                 } as AggregatedSaleLine;
             });
-            console.log(aggregatedData);
             return _.orderBy(aggregatedData, ['locationName', 'productName']);
 
         } catch (error) {
@@ -236,7 +233,6 @@ export default class SaleLineModel extends Model {
             throw error;
         }
     };
-
 }
 
 export const groupAggregatedSalesByLocation = async  (
@@ -276,7 +272,6 @@ export const groupAggregatedSalesByProduct = async  (
 
     return _.orderBy(aggregatedData, ['locationName']);
 };
-
 export const totalAggregatedSales = async  (
     aggregatedSales: AggregatedSaleLine[]
 ): Promise<SaleAggregationTotals> => {
