@@ -17,4 +17,5 @@ export type RootStackParamList = {
         showLocationModal?: boolean
     };
     Reporting: undefined;
+    OneDayReport: undefined;
 };

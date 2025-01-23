@@ -1,111 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    Platform,
+    StyleSheet, Button,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import {themeColors} from "@/constants/theme-colors";
-import SaleLineModel, {
-    groupAggregatedSalesByLocation,
-    groupAggregatedSalesByProduct,
-    LocationGroupedAggregatedSaleLineModel,
-    ProductGroupedAggregatedSaleLineModel, SaleAggregationTotals,
-    totalAggregatedSales
-} from "@/services/local-data/models/sale-line-model";
-import database from "@/services/local-data/context";
-import SalesReport from "@/app/(tabs)/reporting/sales-report";
+import {useNavigation} from "@react-navigation/native";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {RootStackParamList} from "@/models/ProjectRouteParams";
 
+type ListScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const ReportingScreen = () => {
-    const [startDate, setStartDate] = useState(new Date());
-    const [show, setShow] = useState(false);
-    const [showReport, setShowReport] = useState(false);
-    const [salesGroupedByLocation, setSalesGroupedByLocation] =
-        useState<LocationGroupedAggregatedSaleLineModel[]>([])
-    const [salesGroupedByProduct, setSalesGroupedByProduct] =
-        useState<ProductGroupedAggregatedSaleLineModel[]>([])
-    const [salesTotals, setSalesTotals] =
-        useState<SaleAggregationTotals>({} as SaleAggregationTotals)
-    const formatDisplayDate = (date: Date): string => {
-        const options: Intl.DateTimeFormatOptions = {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        };
-        return date.toLocaleDateString('en-US', options);
-    };
-
-    const onChange = (event: any, selectedDate?: Date) => {
-        const currentDate = selectedDate || startDate;
-        setShow(Platform.OS === 'ios');
-        setStartDate(currentDate);
-    };
-
-    const showDatepicker = () => {
-        setShow(true);
-    };
-
-    const EndOfDayReport = async () => {
-        const dayStart = dateUtils.getStartOfDay(startDate);
-        var dayEnd = dateUtils.getEndOfDay(startDate);
-        const reportData = await SaleLineModel.aggregatedSalesByDateRange(database, dayStart, dayEnd);
-
-        setShowReport(true);
-        setSalesGroupedByLocation(await groupAggregatedSalesByLocation(reportData));
-        setSalesGroupedByProduct(await groupAggregatedSalesByProduct(reportData));
-        setSalesTotals(await totalAggregatedSales(reportData));
-
-    }
+    const navigation = useNavigation<ListScreenNavigationProp>();
 
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity
-                onPress={showDatepicker}
-                style={[
-                    styles.button,
-                    { backgroundColor: themeColors.primary }
-                ]}
-            >
-                <Text style={styles.dateText}>
-                    {formatDisplayDate(startDate)}
-                </Text>
-            </TouchableOpacity>
-
-            {show && (
-                <DateTimePicker
-                    testID="dateTimePicker"
-                    value={startDate}
-                    mode="date"
-                    display="default"
-                    onChange={onChange}
+            <View style={styles.listContainer}>
+                <Button
+                    title="Day Report"
+                    color={themeColors.primary} // Apply primary color to buttons
+                    onPress={() => navigation.navigate('OneDayReport')}
                 />
-            )}
-
-            <TouchableOpacity
-                onPress={EndOfDayReport}
-                style={[
-                    styles.button,
-                    { backgroundColor: themeColors.primary }
-                ]}
-            >
-                <Text style={styles.dateText}>
-                    Run Day Report
-                </Text>
-            </TouchableOpacity>
-
-            {showReport &&
-                <SalesReport
-                    locationGroupedData={salesGroupedByLocation}
-                    productGroupedData={salesGroupedByProduct}
-                    totals={salesTotals}
-                />
-            }
-
+            </View>
 
         </View>
     );
@@ -113,48 +30,15 @@ const ReportingScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 10,
-        height: '100%'
-    },
-    button: {
-        padding: 15,
-        borderRadius: 8,
-        alignItems: 'center',
+        flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: themeColors.background, // Use theme background color
     },
-    dateText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
+    listContainer: {
+        padding: 16,
     },
 });
 
-// Export helper functions separately for reuse
-export const dateUtils = {
-    getStartOfDay: (date: Date): number => {
-        const start = new Date(date);
-        start.setHours(0, 0, 0, 0);
-        return start.getTime();
-    },
-
-    getEndOfDay: (date: Date): number => {
-        const end = new Date(date);
-        end.setHours(23, 59, 59, 999);
-        return end.getTime();
-    },
-
-    getTimestampRange: (date: Date): { startTimestamp: number, endTimestamp: number } => {
-        const start = new Date(date);
-        start.setHours(0, 0, 0, 0);
-
-        const end = new Date(date);
-        end.setHours(23, 59, 59, 999);
-
-        return {
-            startTimestamp: start.getTime(),
-            endTimestamp: end.getTime()
-        };
-    }
-};
 
 export default ReportingScreen;

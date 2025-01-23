@@ -27,6 +27,7 @@ import SaleScreen from "@/app/(tabs)/manage/sales";
 import {TouchableOpacity, Text} from "react-native";
 import {RootStackParamList} from "@/models/ProjectRouteParams";
 import ReportingScreen from "@/app/(tabs)/reporting";
+import OneDayReport from "@/app/(tabs)/reporting/reports/one-day-report";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -60,6 +61,7 @@ function ReportingStackNavigator(){
             name="Reporting"
             component={ReportingScreen}
         />
+        <ManageStack.Screen name="OneDayReport" component={OneDayReport}/>
     </ManageStack.Navigator>
 }
 
