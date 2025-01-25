@@ -7,7 +7,6 @@ import {themeColors} from "@/constants/theme-colors";
 import {useNavigation} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {RootStackParamList} from "@/models/ProjectRouteParams";
-import DateRangeReport from "@/app/(tabs)/reporting/reports/date-range-report";
 
 type ListScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -34,6 +33,14 @@ const ReportingScreen = () => {
 
             </View>
 
+            <View style={styles.listContainer}>
+                <Button
+                    title="Sales Tax Report"
+                    color={themeColors.primary} // Apply primary color to buttons
+                    onPress={() => navigation.navigate('SalesTaxReport')}
+                />
+
+            </View>
 
         </View>
     );

@@ -29,6 +29,7 @@ import {RootStackParamList} from "@/models/ProjectRouteParams";
 import ReportingScreen from "@/app/(tabs)/reporting";
 import OneDayReport from "@/app/(tabs)/reporting/reports/one-day-report";
 import DateRangeReport from "@/app/(tabs)/reporting/reports/date-range-report";
+import SalesTaxReport from "@/app/(tabs)/reporting/reports/sales-tax-report";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -64,7 +65,7 @@ function ReportingStackNavigator(){
         />
         <ManageStack.Screen name="OneDayReport" component={OneDayReport}/>
         <ManageStack.Screen name="DateRangeReport" component={DateRangeReport}/>
-
+        <ManageStack.Screen name="SalesTaxReport" component={SalesTaxReport}/>
 
     </ManageStack.Navigator>
 }
