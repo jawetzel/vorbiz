@@ -22,9 +22,6 @@ import {themeColors} from "@/constants/theme-colors";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import QRCodeGenerator from "@/app/(tabs)/manage/products/qr-generator";
 
-
-
-
 type ProductDetailScreenNavigationProp = NativeStackNavigationProp<
     RootStackParamList,
     'ProductDetail'
@@ -164,7 +161,6 @@ export default function ProductDetailScreen() {
                 Alert.alert('Success', `Product ${id ? 'updated' : 'created'} successfully.`);
             //navigation.goBack();
         } catch (error) {
-            //console.error('Error saving product:', error);
             if(!disableAlert)
                 Alert.alert('Error', `Failed to ${id ? 'update' : 'create'} product.`);
         } finally {
@@ -233,7 +229,11 @@ export default function ProductDetailScreen() {
 
     const productInfoGroup =  {
             category: 'Product Info',
-            fields: ['quickButton', 'name', 'description', 'price', 'category', 'brand', 'image', 'certifications', 'upc', 'isActive']
+            fields: [
+                'quickButton', 'name', 'description', 'price',
+                'category', 'brand', 'image', 'certifications',
+                'upc', 'isActive'
+            ]
         }
     const fieldGroups = [
         {
@@ -251,7 +251,10 @@ export default function ProductDetailScreen() {
         },
         {
             category: 'Personalization Options',
-            fields: ['canPersonalizeCustomText', 'canPersonalizeCustomImage', 'canPersonalizeSize', 'canPersonalizeCustomMessage', 'canPersonalizeGiftwrap'],
+            fields: [
+                'canPersonalizeCustomText', 'canPersonalizeCustomImage', 'canPersonalizeSize',
+                'canPersonalizeCustomMessage', 'canPersonalizeGiftwrap'
+            ],
         },
         {
             category: 'SEO',

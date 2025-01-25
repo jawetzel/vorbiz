@@ -18,4 +18,5 @@ export type RootStackParamList = {
     };
     Reporting: undefined;
     OneDayReport: undefined;
+    DateRangeReport: undefined;
 };

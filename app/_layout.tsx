@@ -28,6 +28,7 @@ import {TouchableOpacity, Text} from "react-native";
 import {RootStackParamList} from "@/models/ProjectRouteParams";
 import ReportingScreen from "@/app/(tabs)/reporting";
 import OneDayReport from "@/app/(tabs)/reporting/reports/one-day-report";
+import DateRangeReport from "@/app/(tabs)/reporting/reports/date-range-report";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -62,6 +63,9 @@ function ReportingStackNavigator(){
             component={ReportingScreen}
         />
         <ManageStack.Screen name="OneDayReport" component={OneDayReport}/>
+        <ManageStack.Screen name="DateRangeReport" component={DateRangeReport}/>
+
+
     </ManageStack.Navigator>
 }
 

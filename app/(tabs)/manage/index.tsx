@@ -12,29 +12,22 @@ function ManageScreen() {
 
     return (
         <View style={styles.container}>
-        <View style={styles.listContainer}>
-            <Button
-                title="View Reporting"
-                color={themeColors.primary} // Apply primary color to buttons
-                onPress={() => navigation.navigate('Reporting')}
-            />
-        </View>
 
-        <View style={styles.listContainer}>
-            <Button
-                title="View Locations"
-                color={themeColors.primary} // Apply primary color to buttons
-                onPress={() => navigation.navigate('Locations')}
-            />
+            <View style={styles.listContainer}>
+                <Button
+                    title="View Locations"
+                    color={themeColors.primary} // Apply primary color to buttons
+                    onPress={() => navigation.navigate('Locations')}
+                />
+            </View>
+            <View style={styles.listContainer}>
+                <Button
+                    title="View Products"
+                    color={themeColors.primary} // Apply primary color to buttons
+                    onPress={() => navigation.navigate('Products')}
+                />
+            </View>
         </View>
-        <View style={styles.listContainer}>
-            <Button
-                title="View Products"
-                color={themeColors.primary} // Apply primary color to buttons
-                onPress={() => navigation.navigate('Products')}
-            />
-        </View>
-    </View>
     );
 }
 

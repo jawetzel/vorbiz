@@ -1,4 +1,8 @@
 
+export const GetDaysAgo = (days: number) => {
+    const oneDayMs = 1000 * 60 * 60 * 24;
+    return new Date(new Date().getTime() - (oneDayMs * days));
+}
 
 export const getStartOfDay = (date: Date): number => {
     const start = new Date(date);

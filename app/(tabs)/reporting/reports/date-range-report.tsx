@@ -15,12 +15,16 @@ import SaleLineModel, {
 } from "@/services/local-data/models/sale-line-model";
 import database from "@/services/local-data/context";
 import SalesReport from "@/app/(tabs)/reporting/sales-report";
-import {getEndOfDay, getStartOfDay} from "@/utils/date-utils";
+import {GetDaysAgo, getEndOfDay, getStartOfDay} from "@/utils/date-utils";
 import DatePicker from "@/components/ui/inputs/input-types/date-picker-input";
 
-const OneDayReport = () => {
-    const [startDate, setStartDate] = useState(new Date());
-    const [reportDate, setReportDate] = useState<Date | null>(null);
+const DateRangeReport = () => {
+    const [startDate, setStartDate] = useState(GetDaysAgo(30));
+    const [endDate, setEndDate] = useState(new Date());
+
+    const [reportStartDate, setReportStartDate] = useState<Date | null>(null);
+    const [reportEndDate, setReportEndDate] = useState<Date | null>(null);
+
     const [showReport, setShowReport] = useState(false);
     const [salesGroupedByLocation, setSalesGroupedByLocation] =
         useState<LocationGroupedAggregatedSaleLineModel[]>([]);
@@ -29,13 +33,13 @@ const OneDayReport = () => {
     const [salesTotals, setSalesTotals] =
         useState<SaleAggregationTotals>({} as SaleAggregationTotals);
 
-
-    const EndOfDayReport = async () => {
+    const RunReport = async () => {
         const dayStart = getStartOfDay(startDate);
-        var dayEnd = getEndOfDay(startDate);
+        var dayEnd = getEndOfDay(endDate);
         const reportData = await SaleLineModel.aggregatedSalesByDateRange(database, dayStart, dayEnd);
 
-        setReportDate(startDate);
+        setReportStartDate(startDate);
+        setReportEndDate(endDate)
         setShowReport(true);
         setSalesGroupedByLocation(await groupAggregatedSalesByLocation(reportData));
         setSalesGroupedByProduct(await groupAggregatedSalesByProduct(reportData));
@@ -45,22 +49,66 @@ const OneDayReport = () => {
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
-                <Text style={styles.headerTitle}>Single Day Report</Text>
+                <Text style={styles.headerTitle}>Date Range Report</Text>
             </View>
-
-            <View style={styles.dateSection}>
-                <DatePicker
-                    selectedDate={startDate}
-                    onDateChange={setStartDate}
-                />
+            <View style={styles.quickButtonSection}>
+                <TouchableOpacity
+                    onPress={() => {
+                        setStartDate(GetDaysAgo(7))
+                        setEndDate(new Date())
+                    }}
+                    style={styles.quickButton}
+                >
+                    <Text style={styles.quickButtonText}>Week</Text>
+                </TouchableOpacity>
 
                 <TouchableOpacity
-                    onPress={EndOfDayReport}
+                    onPress={() => {
+                        setStartDate(GetDaysAgo(30))
+                        setEndDate(new Date())
+                    }}
+                    style={styles.quickButton}
+                >
+                    <Text style={styles.quickButtonText}>30 Days</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    onPress={() => {
+                        setStartDate(GetDaysAgo(90))
+                        setEndDate(new Date())
+                    }}
+                    style={styles.quickButton}
+                >
+                    <Text style={styles.quickButtonText}>90 Days</Text>
+                </TouchableOpacity>
+            </View>
+
+
+            <View style={styles.dateSection}>
+                <View style={styles.dateRangeContainer}>
+                    <View style={styles.dateRangeInputContainer}>
+                        <DatePicker
+                            selectedDate={startDate}
+                            onDateChange={setStartDate}
+                            label={"Start Date"}
+                        />
+                    </View>
+                    <View style={styles.dateRangeInputContainer}>
+                        <DatePicker
+                            selectedDate={endDate}
+                            onDateChange={setEndDate}
+                            label={"End Date"}
+                        />
+                    </View>
+                </View>
+                <TouchableOpacity
+                    onPress={RunReport}
                     style={styles.runReportButton}
                 >
                     <Text style={styles.runReportButtonText}>Generate Report</Text>
                 </TouchableOpacity>
             </View>
+
 
             {showReport && (
                 <View style={styles.reportContainer}>
@@ -68,7 +116,7 @@ const OneDayReport = () => {
                         locationGroupedData={salesGroupedByLocation}
                         productGroupedData={salesGroupedByProduct}
                         totals={salesTotals}
-                        title={`${reportDate?.toLocaleDateString()} Report`}
+                        title={`${reportStartDate?.toLocaleDateString()} - ${reportEndDate?.toLocaleDateString()} Report`}
                     />
                 </View>
             )}
@@ -98,6 +146,25 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: themeColors.textLight,
     },
+    quickButtonSection: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
+        paddingTop: 8,
+        gap: 8,
+    },
+    quickButton: {
+        flex: 1,
+        backgroundColor: themeColors.secondary,
+        borderRadius: 12,
+        padding: 8,
+        alignItems: 'center',
+    },
+    quickButtonText: {
+        color: themeColors.headerTitle,
+        fontSize: 14,
+        fontWeight: '600',
+    },
     dateSection: {
         padding: 12,
         gap: 8,
@@ -118,6 +185,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         backgroundColor: themeColors.backgroundThree,
     },
+    dateRangeContainer: {
+        flexDirection: 'row',
+    },
+    dateRangeInputContainer: {
+        width: '49%'
+    }
 });
 
-export default OneDayReport;
+export default DateRangeReport;

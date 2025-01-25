@@ -20,15 +20,14 @@ interface DatePickerProps {
 const DatePicker: React.FC<DatePickerProps> = ({
                                                    selectedDate,
                                                    onDateChange,
-                                                   label = "Selected Date"  // default value
+                                                   label = "Selected Date",  // default value
                                                }) => {
     const [show, setShow] = useState(false);
 
     const formatDisplayDate = (date: Date): string => {
         const options: Intl.DateTimeFormatOptions = {
-            weekday: 'long',
             year: 'numeric',
-            month: 'long',
+            month: 'numeric',
             day: 'numeric'
         };
         return date.toLocaleDateString('en-US', options);
@@ -56,7 +55,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
                         <FontAwesomeIcon icon={faCalendar} size={24} color={themeColors.secondary} />
                     </Text>
                     <View style={styles.dateTextContainer}>
-                        <Text style={styles.dateLabel}>Selected Date</Text>
+                        <Text style={styles.dateLabel}>{label}</Text>
                         <Text style={styles.dateValue}>{formatDisplayDate(selectedDate)}</Text>
                     </View>
                     <Text style={styles.iconContainer}>
@@ -84,7 +83,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         borderColor: themeColors.borders,
-        padding: 12,
+        padding: 6,
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -92,7 +91,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.1,
         shadowRadius: 2,
-        elevation: 2,
+        elevation: 2
     },
     dateButtonContent: {
         flexDirection: 'row',
