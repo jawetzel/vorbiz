@@ -2,9 +2,14 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { themeColors } from "@/constants/theme-colors";
 import {
-    LocationGroupedAggregatedSaleLineModel,
-    ProductGroupedAggregatedSaleLineModel, SaleAggregationTotals
+    SaleAggregationTotals
 } from "@/services/local-data/models/sale-line-model";
+import {
+    LocationGroupedAggregatedSaleLineModel
+} from "@/services/local-data/views/reporting/sales/location-sales-report-view";
+import {
+    ProductGroupedAggregatedSaleLineModel
+} from "@/services/local-data/views/reporting/sales/product-sales-report-view";
 
 interface Props {
     locationGroupedData: LocationGroupedAggregatedSaleLineModel[];
@@ -63,7 +68,7 @@ const SalesReport: React.FC<Props> = ({
                                     <View style={styles.valueRow}>
                                         <Text style={styles.label}>Tax:</Text>
                                         <Text style={styles.value}>
-                                            ${(sale.totalCountyParishTax + sale.totalStateTax).toFixed(2)}
+                                            ${(sale.totalLocalTax + sale.totalStateTax).toFixed(2)}
                                         </Text>
                                     </View>
                                     <View style={[styles.valueRow, styles.totalRow]}>
@@ -117,7 +122,7 @@ const SalesReport: React.FC<Props> = ({
                                     <Text style={styles.label}>Tax:</Text>
                                     <Text style={styles.value}>
                                         ${product.aggregatedSales.reduce((sum, sale) =>
-                                        sum + sale.totalCountyParishTax + sale.totalStateTax, 0).toFixed(2)}
+                                        sum + sale.totalLocalTax + sale.totalStateTax, 0).toFixed(2)}
                                     </Text>
                                 </View>
                                 <View style={[styles.valueRow, styles.totalRow]}>

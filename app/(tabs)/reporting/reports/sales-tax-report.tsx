@@ -6,28 +6,19 @@ import {
     StyleSheet,
 } from 'react-native';
 import { themeColors } from "@/constants/theme-colors";
-import SaleLineModel, {
-    groupAggregatedSalesByLocation,
-    groupAggregatedSalesByProduct,
-    LocationGroupedAggregatedSaleLineModel,
-    ProductGroupedAggregatedSaleLineModel,
-    SaleAggregationTotals, totalAggregatedSales,
-} from "@/services/local-data/models/sale-line-model";
+import SaleLineModel from "@/services/local-data/models/sale-line-model";
 import database from "@/services/local-data/context";
-import SalesReport from "@/app/(tabs)/reporting/sales-report";
 import {
     GetDateRangeForMonth,
-    GetDaysAgo,
     getEndOfDay,
-    GetLastMonthOneIndexed, GetRecentMonthYearOptions,
+    GetRecentMonthYearOptions,
     getStartOfDay,
     MonthYearViewModel
 } from "@/utils/date-utils";
-import DatePicker from "@/components/ui/inputs/input-types/date-picker-input";
 import {Picker} from "@react-native-picker/picker";
-import InputField from "@/components/ui/inputs/input-field";
 import {CommonInputStyles} from "@/components/ui/inputs/input-styles";
-import InputError from "@/components/ui/inputs/input-error";
+import {taxBreakdownByState} from "@/services/local-data/views/reporting/tax/state-tax-reporting-views";
+import {taxBreakdownByJurisdiction} from "@/services/local-data/views/reporting/tax/local-taxt-report-view";
 
 const SalesTaxReport = () => {
     const monthYearOptions = GetRecentMonthYearOptions();
@@ -46,7 +37,9 @@ const SalesTaxReport = () => {
     const RunReport = async () => {
         const dayStart = getStartOfDay(startDate);
         const dayEnd = getEndOfDay(endDate);
-        const reportData = await SaleLineModel.aggregatedSalesByDateRange(database, dayStart, dayEnd);
+        const reportData = await SaleLineModel.saleLinesByDateRange(database, dayStart, dayEnd);
+        const stateSalesTax = taxBreakdownByState(reportData);
+        const jurisdictionTaxes = taxBreakdownByJurisdiction(reportData);
         //todo we need to break this down by location state, parish, & tax zone
         //todo we need a breakdown by state
         //todo we need to look into the common cases for local & state taxes for what data we might be missing
@@ -54,9 +47,6 @@ const SalesTaxReport = () => {
         setShowReport(true);
     };
 
-    const selectedOption = monthYearOptions.find(
-        option => option.month === selectedMonthYear.month && option.year === selectedMonthYear.year
-    );
 
     return (
         <View style={styles.container}>

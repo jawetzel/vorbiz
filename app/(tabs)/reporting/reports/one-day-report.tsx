@@ -6,17 +6,23 @@ import {
     StyleSheet,
 } from 'react-native';
 import { themeColors } from "@/constants/theme-colors";
-import SaleLineModel, {
-    groupAggregatedSalesByLocation,
-    groupAggregatedSalesByProduct,
-    LocationGroupedAggregatedSaleLineModel,
-    ProductGroupedAggregatedSaleLineModel,
-    SaleAggregationTotals, totalAggregatedSales,
-} from "@/services/local-data/models/sale-line-model";
+import SaleLineModel from "@/services/local-data/models/sale-line-model";
 import database from "@/services/local-data/context";
 import SalesReport from "@/app/(tabs)/reporting/sales-report";
 import {getEndOfDay, getStartOfDay} from "@/utils/date-utils";
 import DatePicker from "@/components/ui/inputs/input-types/date-picker-input";
+import {
+    groupAggregatedSalesByLocation,
+    LocationGroupedAggregatedSaleLineModel
+} from "@/services/local-data/views/reporting/sales/location-sales-report-view";
+import {
+    groupAggregatedSalesByProduct,
+    ProductGroupedAggregatedSaleLineModel
+} from "@/services/local-data/views/reporting/sales/product-sales-report-view";
+import {
+    SaleAggregationTotals,
+    totalAggregatedSales
+} from "@/services/local-data/views/reporting/sales/total-sales-report-view";
 
 const OneDayReport = () => {
     const [startDate, setStartDate] = useState(new Date());

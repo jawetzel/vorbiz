@@ -60,7 +60,7 @@ const ScreenOptions = {
 function ReportingStackNavigator(){
     return <ManageStack.Navigator screenOptions={ScreenOptions}>
         <ManageStack.Screen
-            name="Reporting"
+            name="ReportingHome"
             component={ReportingScreen}
         />
         <ManageStack.Screen name="OneDayReport" component={OneDayReport}/>

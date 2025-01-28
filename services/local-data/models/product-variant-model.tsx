@@ -3,6 +3,7 @@ import { Q } from '@nozbe/watermelondb';
 import { field, text } from '@nozbe/watermelondb/decorators';
 import {Associations} from "@nozbe/watermelondb/Model";
 import {InputFieldTypes} from "@/models/constants";
+import {ValidateProductVariant} from "@/utils/validation/model-validators/product-variant-validators";
 
 export default class ProductVariantModel extends Model {
     static table = 'productVariants';
@@ -16,6 +17,8 @@ export default class ProductVariantModel extends Model {
         {name: 'image', type: 'string'},
         {name: 'upc', type: 'string', inputType: InputFieldTypes.numeric},
         {name: 'isActive', type: 'boolean' },
+        {name: 'isTaxIncludedPrice', type: 'boolean' },
+
     ];
     static associations: Associations = {
         products: { type: 'belongs_to', key: 'product_id' },
@@ -39,12 +42,11 @@ export default class ProductVariantModel extends Model {
     @text('image') image!: string | null;
     @text('upc') upc!: string | null;
     @field('isActive') isActive!: boolean;
+    @field('isTaxIncludedPrice') isTaxIncludedPrice!: boolean;
+
 
     static validate(variantData: any) {
-        const errors: Record<string, string> = {};
-
-
-        return errors;
+        return ValidateProductVariant(variantData);
     }
 
 

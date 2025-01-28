@@ -33,6 +33,7 @@ const CreateProductVariantModal:
             product_id: productId,
             upc: '',
             isActive: true,
+            isTaxIncludedPrice: false,
         } as ProductVariantModel);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] =
@@ -56,6 +57,7 @@ const CreateProductVariantModal:
             upc: fetchedProduct.upc,
             product_id: productId,
             isActive: fetchedProduct.isActive,
+            isTaxIncludedPrice: fetchedProduct.isTaxIncludedPrice ?? false,
         } as ProductVariantModel;
     }
 
@@ -176,6 +178,7 @@ const CreateProductVariantModal:
             price: "Price",
             image: "Image Url",
             isActive: "Variant Active",
+            isTaxIncludedPrice: "Product Price Includes Sales Tax",
         };
     return (
 
@@ -183,7 +186,7 @@ const CreateProductVariantModal:
             <View style={styles.modalContainer}>
                 <Text style={styles.title}>{variantIdState ? "Update" : "Create"} Product Variant</Text>
 
-                {['upc', 'size', 'color', 'material', 'price', 'image', 'isActive'].map((field) => {
+                {['upc', 'size', 'color', 'material', 'price', 'image', 'isTaxIncludedPrice', 'isActive'].map((field) => {
                     return <InputField key={field}
                                        title={fieldDisplayNames[field]}
                                        fieldType={ProductVariantModel.GetColumnType(field)}

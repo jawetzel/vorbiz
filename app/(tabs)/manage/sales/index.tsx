@@ -28,6 +28,7 @@ import {
     CookieStorageKeyDefs,
     CookieStorageStoreData
 } from "@/services/local-storage/cookie-storage";
+import {GetPriceFromItem} from "@/utils/product-utils";
 
 type LineItem = {
     product: ProductModel;
@@ -57,7 +58,7 @@ export default function SaleScreen() {
     const [subtotal, setSubtotal] = useState(0);
     const [tax, setTax] = useState(0);
     const [total, setTotal] = useState(0);
-    const [countyParishTaxRate, setCountyParishTaxRate] = useState(0);
+    const [localTaxRate, setLocalTaxRate] = useState(0);
     const [stateTaxRate, setStateTaxRate] = useState(0);
 
     useEffect(() => {
@@ -80,14 +81,14 @@ export default function SaleScreen() {
             const data = await LocationModel.loadById(database, locationString);
             if(data){
                 setStateTaxRate(data.stateTaxRate ?? 0);
-                setCountyParishTaxRate(data.countyParishTaxRate ?? 0);
+                setLocalTaxRate(data.localTaxRate ?? 0);
                 setLocation(data);
-                UpdateTotalsSection(data.countyParishTaxRate ?? 0, data.stateTaxRate ?? 0);
+                UpdateTotalsSection(data.localTaxRate ?? 0, data.stateTaxRate ?? 0);
             }
         }
     }
 
-    const UpdateTotalsSection = (localCountyTaxRate = countyParishTaxRate, localStateTaxRate = stateTaxRate) => {
+    const UpdateTotalsSection = (localCountyTaxRate = localTaxRate, localStateTaxRate = stateTaxRate) => {
         const newSubtotal = lineItems.reduce((sum, item) => sum + item.linePrice, 0);
         const calculatedTax = Math.round(newSubtotal * ((localCountyTaxRate + localStateTaxRate) / 100) * 100) / 100;
         setSubtotal(newSubtotal);
@@ -110,13 +111,15 @@ export default function SaleScreen() {
         }
     };
 
+
+
     const handleAddLineItem = () => {
         if (!selectedProduct) {
             Alert.alert('Error', 'Please select a product.');
             return;
         }
 
-        const price = selectedVariant?.price || selectedProduct.price;
+
 
         setLineItems((prev) => {
             const existingIndex = prev.findIndex(
@@ -127,13 +130,16 @@ export default function SaleScreen() {
 
             if (existingIndex !== -1) {
                 return prev.map((item, index) =>
-                    index === existingIndex
-                        ? {
-                            ...item,
-                            quantity: item.quantity + 1,
-                            linePrice: (item.quantity + 1) * (item.variant?.price || item.product.price || 0),
-                        }
-                        : item
+                    {
+                        const itemPrice = GetPriceFromItem(item.product, item.variant, localTaxRate, stateTaxRate);
+                        return index === existingIndex
+                            ? {
+                                ...item,
+                                quantity: item.quantity + 1,
+                                linePrice: (item.quantity + 1) * itemPrice,
+                            }
+                            : item;
+                    }
                 );
             }
 
@@ -143,7 +149,7 @@ export default function SaleScreen() {
                     product: selectedProduct,
                     variant: selectedVariant || undefined,
                     quantity: 1,
-                    linePrice: price,
+                    linePrice: GetPriceFromItem(selectedProduct, selectedVariant, localTaxRate, stateTaxRate),
                 } as LineItem,
             ];
         });
@@ -160,7 +166,7 @@ export default function SaleScreen() {
                         acc.push({
                             ...item,
                             quantity: newQuantity,
-                            linePrice: newQuantity * (item.variant?.price || item.product.price || 0),
+                            linePrice: newQuantity * GetPriceFromItem(item.product, item.variant, localTaxRate, stateTaxRate),
                         });
                     }
                 }
@@ -182,7 +188,7 @@ export default function SaleScreen() {
                 const newSale = await SaleModel.createTrans(database, {
                     location_id: location.id,
                     stateTaxRate: stateTaxRate,
-                    countyParishTaxRate: countyParishTaxRate,
+                    localTaxRate: localTaxRate,
                     saleDate: saleDate.getTime(),
                 } as SaleModel);
 
@@ -192,10 +198,10 @@ export default function SaleScreen() {
 
                 for (const lineItem of lineItems) {
                     const subtotal = lineItem.linePrice;
-                    const countyParishTaxAmount = subtotal * (countyParishTaxRate / 100);
-                    const stateTaxAmount = subtotal * (stateTaxRate / 100);
+                    const localTaxAmount = Math.round((subtotal * (localTaxRate / 100)) * 100) / 100;
+                    const stateTaxAmount = Math.round((subtotal * (stateTaxRate / 100)) * 100) / 100;
                     const discount = 0;
-                    const total = subtotal + countyParishTaxAmount + stateTaxAmount - discount;
+                    const total = subtotal + localTaxAmount + stateTaxAmount - discount;
 
                     const newLine = await SaleLineModel.createTrans(database, {
                         sale_id: newSale.id,
@@ -203,7 +209,7 @@ export default function SaleScreen() {
                         productVariant_id: lineItem.variant?.id,
                         qty: lineItem.quantity,
                         subtotal,
-                        countyParishTaxAmount,
+                        localTaxAmount,
                         stateTaxAmount,
                         discount,
                         total,
@@ -244,8 +250,8 @@ export default function SaleScreen() {
         console.log(selectedLocation);
         setLocation(selectedLocation);
         setStateTaxRate(selectedLocation.stateTaxRate ?? 0);
-        setCountyParishTaxRate(selectedLocation.countyParishTaxRate ?? 0);
-        UpdateTotalsSection(selectedLocation.countyParishTaxRate ?? 0, selectedLocation.stateTaxRate ?? 0);
+        setLocalTaxRate(selectedLocation.localTaxRate ?? 0);
+        UpdateTotalsSection(selectedLocation.localTaxRate ?? 0, selectedLocation.stateTaxRate ?? 0);
         navigation.setParams({
             toggleQRScanner: route.params?.toggleQRScanner,
             showLocationModal: false
@@ -419,7 +425,7 @@ export default function SaleScreen() {
                         <Text style={footerStyles.taxLabel}>
                             <Text>Tax </Text>
                             <Text style={{fontSize: 10}}>
-                                ({(stateTaxRate + countyParishTaxRate).toFixed(2)}%)
+                                ({(stateTaxRate + localTaxRate).toFixed(2)}%)
                             </Text>
                             <Text>: </Text>
                         </Text>

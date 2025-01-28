@@ -7,6 +7,7 @@ import ProductModel from "@/services/local-data/models/product-model";
 import SaleLineModel from "@/services/local-data/models/sale-line-model";
 import SaleModel from "@/services/local-data/models/sale-model";
 import ProductVariantModel from "@/services/local-data/models/product-variant-model";
+import CustomerModel from "@/services/local-data/models/customer-model";
 
 
 // First, create the adapter to the underlying database:
@@ -32,7 +33,8 @@ const database = new Database({
         ProductModel,
         ProductVariantModel,
         SaleLineModel,
-        SaleModel
+        SaleModel,
+        CustomerModel
     ],
 })
 export default database;

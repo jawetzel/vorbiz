@@ -20,7 +20,7 @@ export default class SaleLineModel extends Model {
         { name: 'productVariant_id',    type: 'string',     isIndexed: true }, // Relation to `products`
         { name: 'qty',                  type: 'number',     inputType: InputFieldTypes.numeric },
         { name: 'subtotal',             type: 'number',     inputType: InputFieldTypes.money },
-        { name: 'countyParishTaxAmount',type: 'number',     inputType: InputFieldTypes.money },
+        { name: 'localTaxAmount',       type: 'number',     inputType: InputFieldTypes.money },
         { name: 'stateTaxAmount',       type: 'number',     inputType: InputFieldTypes.money },
         { name: 'discount',             type: 'number',     inputType: InputFieldTypes.money },
         { name: 'total',                type: 'number',     inputType: InputFieldTypes.money },
@@ -47,7 +47,7 @@ export default class SaleLineModel extends Model {
 
     @field('qty') qty!: number;
     @field('subtotal') subtotal!: number;
-    @field('countyParishTaxAmount') countyParishTaxAmount!: number;
+    @field('localTaxAmount') localTaxAmount!: number;
     @field('stateTaxAmount') stateTaxAmount!: number;
     @field('discount') discount!: number;
     @field('total') total!: number;
@@ -221,7 +221,7 @@ export default class SaleLineModel extends Model {
                     variant: variant,
                     totalQty: _.sumBy(group, 'line.qty'),
                     totalSubtotal: _.sumBy(group, 'line.subtotal'),
-                    totalCountyParishTax: _.sumBy(group, 'line.countyParishTaxAmount'),
+                    totalLocalTax: _.sumBy(group, 'line.localTaxAmount'),
                     totalStateTax: _.sumBy(group, 'line.stateTaxAmount'),
                     totalAmount: _.sumBy(group, 'line.total')
                 } as AggregatedSaleLine;
@@ -235,69 +235,6 @@ export default class SaleLineModel extends Model {
     };
 }
 
-export const groupAggregatedSalesByLocation = async  (
-    aggregatedSales: AggregatedSaleLine[]
-): Promise<LocationGroupedAggregatedSaleLineModel[]> => {
-    const groupedSales = _.groupBy(aggregatedSales, line =>
-        line.location.id
-    );
-
-    const aggregatedData = Object.values(groupedSales).map(group => {
-        const { location} = group[0];
-        return {
-            locationName: location.name,
-            location: location,
-            aggregatedSales: group
-        } as LocationGroupedAggregatedSaleLineModel;
-    });
-
-    return _.orderBy(aggregatedData, ['locationName']);
-};
-export const groupAggregatedSalesByProduct = async  (
-    aggregatedSales: AggregatedSaleLine[]
-): Promise<ProductGroupedAggregatedSaleLineModel[]> => {
-
-    const groupedSales = _.groupBy(aggregatedSales, line =>
-        `${line.product.id}|${line.variant?.id || ""}`
-    );
-
-    const aggregatedData = Object.values(groupedSales).map(group => {
-        const { product, variant} = group[0];
-        return {
-            product: product,
-            variant: variant,
-            aggregatedSales: group
-        } as ProductGroupedAggregatedSaleLineModel;
-    });
-
-    return _.orderBy(aggregatedData, ['locationName']);
-};
-export const totalAggregatedSales = async  (
-    aggregatedSales: AggregatedSaleLine[]
-): Promise<SaleAggregationTotals> => {
-
-    const totals = aggregatedSales.reduce((acc, curr) => {
-        return {
-            totalSubtotal: acc.totalSubtotal + curr.totalSubtotal,
-            totalTax: acc.totalTax + curr.totalCountyParishTax + curr.totalStateTax,
-            totalAmount: acc.totalAmount + curr.totalAmount,
-            totalQty: acc.totalQty + curr.totalQty
-        };
-    }, { totalSubtotal: 0, totalTax: 0, totalAmount: 0, totalQty: 0 } as SaleAggregationTotals);
-
-    return totals;
-};
-
-export interface LocationGroupedAggregatedSaleLineModel {
-    locationName: string,
-    location: LocationModel,
-    aggregatedSales: AggregatedSaleLine[]
-}
-export interface ProductGroupedAggregatedSaleLineModel {
-    product: ProductModel,
-    variant: ProductVariantModel,
-    aggregatedSales: AggregatedSaleLine[]
-}
 
 export interface SaleLineViewModel {
     sale: SaleModel,
@@ -305,13 +242,6 @@ export interface SaleLineViewModel {
     product: ProductModel,
     variant?: ProductVariantModel,
     line: SaleLineModel,
-
-}
-export interface SaleAggregationTotals {
-    totalQty: number;
-    totalSubtotal: number;
-    totalTax: number;
-    totalAmount: number;
 }
 
 export interface AggregatedSaleLine {
@@ -322,7 +252,7 @@ export interface AggregatedSaleLine {
     variant: ProductVariantModel;
     totalQty: number;
     totalSubtotal: number;
-    totalCountyParishTax: number;
+    totalLocalTax: number;
     totalStateTax: number;
     totalAmount: number;
 }

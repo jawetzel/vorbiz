@@ -2,21 +2,20 @@ import { Model, Database } from '@nozbe/watermelondb';
 import {field, text} from '@nozbe/watermelondb/decorators';
 import {Associations} from "@nozbe/watermelondb/Model";
 import {InputFieldTypes} from "@/models/constants";
-import {ValidateLocation} from "@/utils/validation/model-validators/location-validators";
+import {ValidateCustomer} from "@/utils/validation/model-validators/customer-validators";
 
-export default class LocationModel extends Model {
-    static table = 'locations';
+export default class CustomerModel extends Model {
+    static table = 'customers';
 
     static columns = [
         { name: 'name', type: 'string' },
+        { name: 'resaleCertId', type: 'string' },
+        { name: 'ein', type: 'string' },
+        { name: 'charity501c3ein', type: 'string', inputType: InputFieldTypes.numeric },
         { name: 'address', type: 'string' },
         { name: 'city', type: 'string' },
         { name: 'state', type: 'string', inputType: InputFieldTypes.dropdown },
-        { name: 'countyParish', type: 'string', inputType: InputFieldTypes.dropdown},
         { name: 'zipCode', type: 'string', inputType: InputFieldTypes.numeric },
-        { name: 'localTaxZone', type: 'string' },
-        { name: 'localTaxRate', type: 'number', inputType: InputFieldTypes.percent},
-        { name: 'stateTaxRate', type: 'number', inputType: InputFieldTypes.percent },
         { name: 'phone', type: 'string', inputType: InputFieldTypes.phone },
         { name: 'email', type: 'string', inputType: InputFieldTypes.email},
         { name: 'contactName', type: 'string' },
@@ -25,56 +24,54 @@ export default class LocationModel extends Model {
         sales: { type: 'has_many', foreignKey: 'sale_id' },
     }
     static GetColumnType(column: string){
-        const columnDef = LocationModel.columns.find((col) => col.name === column);
+        const columnDef = CustomerModel.columns.find((col) => col.name === column);
         return columnDef?.type;
     }
     static GetInputType(column: string){
-        const columnDef = LocationModel.columns.find((col) => col.name === column);
+        const columnDef = CustomerModel.columns.find((col) => col.name === column);
         return columnDef?.inputType ?? null;
     }
 
     @text('name') name!: string;
+    @text('resaleCertId') resaleCertId!: string | null;
+    @text('charity501c3ein') ein!: string;
     @text('address') address!: string;
     @text('city') city!: string;
     @text('state') state!: string;
-    @text('countyParish') countyParish!: string;
     @text('zipCode') zipCode!: string;
-    @text('localTaxZone') localTaxZone!: string;
-    @field('localTaxRate') localTaxRate!: number;
-    @field('stateTaxRate') stateTaxRate!: number;
     @text('phone') phone!: string;
     @text('email') email!: string;
     @text('contactName') contactName!: string;
 
 
-    static validate(locationData: any) {
-        return ValidateLocation(locationData);
+    static validate(customerData: any) {
+        return ValidateCustomer(customerData);
     }
 
     // Static method to load
-    static async load(database: Database): Promise<LocationModel[]> {
+    static async load(database: Database): Promise<CustomerModel[]> {
         const locations = await database.collections.get(this.table).query().fetch();
 
         // Cast the result to LocationModel[] explicitly
-        return locations as LocationModel[];
+        return locations as CustomerModel[];
     }
 
     // Static method to load location by ID
-    static async loadById(database: Database, id: string): Promise<LocationModel> {
-        return await database.collections.get(this.table).find(id) as LocationModel;
+    static async loadById(database: Database, id: string): Promise<CustomerModel> {
+        return await database.collections.get(this.table).find(id) as CustomerModel;
     }
 
     // Static method to create a new location
-    static async create(database: Database, locationData: LocationModel): Promise<LocationModel> {
+    static async create(database: Database, locationData: CustomerModel): Promise<CustomerModel> {
         return await database.write(async () => {
             return await database.collections.get(this.table).create((record) => {
                 Object.assign(record, locationData);
             });
-        }) as LocationModel;
+        }) as CustomerModel;
     }
 
     // Static method to update an existing location
-    static async update(database: Database, id: string, locationData: LocationModel): Promise<boolean> {
+    static async update(database: Database, id: string, locationData: CustomerModel): Promise<boolean> {
         await database.write(async () => {
             const existingLocation = await database.collections.get(this.table).find(id);
             await existingLocation.update((record) => {
@@ -93,11 +90,6 @@ export default class LocationModel extends Model {
     }
 }
 
-export interface LocationErrors {
+export interface CustomerErrors {
     name?: string;
-    email?: string;
-    phone?: string;
-    zipCode?: string;
-    localTaxRate?: string;
-    stateTaxRate?: string;
 }

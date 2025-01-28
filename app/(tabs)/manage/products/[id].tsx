@@ -61,7 +61,8 @@ export default function ProductDetailScreen() {
             shippingDimensionH: 0.0,    shippingDimensionW: 0.0,    shippingDimensionD: 0.0,
             dimensionUnitOfMeasurement: 'LBS',
             weightLbs: 0.0,             shippingWeightLbs: 0.0,
-            isActive: true,             quickButton: false
+            isActive: true,             quickButton: false,
+            isTaxIncludedPrice: false,
         } as ProductModel);
 
     const [errors, setErrors] =
@@ -137,6 +138,7 @@ export default function ProductDetailScreen() {
             shippingWeightLbs: fetchedProduct.shippingWeightLbs ?? '',
             isActive: fetchedProduct.isActive ?? '',
             quickButton: fetchedProduct.quickButton ?? '',
+            isTaxIncludedPrice: fetchedProduct.isTaxIncludedPrice ?? false,
         } as ProductModel;
     }
     const handleSave = async () => {
@@ -232,7 +234,7 @@ export default function ProductDetailScreen() {
             fields: [
                 'quickButton', 'name', 'description', 'price',
                 'category', 'brand', 'image', 'certifications',
-                'upc', 'isActive'
+                'upc', 'isTaxIncludedPrice', 'isActive'
             ]
         }
     const fieldGroups = [
@@ -291,6 +293,7 @@ export default function ProductDetailScreen() {
         weightLbs: "Weight (LBS)",
         shippingWeightLbs: "Shipping Weight (LBS)",
         isActive: "Product Active",
+        isTaxIncludedPrice: "Product Price Includes Sales Tax"
     };
 
     const openModal = (variantId: string | null) => {
