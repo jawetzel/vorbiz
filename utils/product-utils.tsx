@@ -13,7 +13,10 @@ export const GetPriceFromItem = (
         (variant && variant.isTaxIncludedPrice) ||
         (product && product.isTaxIncludedPrice)
     ){
-        price = price / (1 + (localTaxRate / 100) + (stateTaxRate / 100));
+        const priceInCents = Math.round(price * 100);
+        const taxMultiplier = 1 + (localTaxRate / 100) + (stateTaxRate / 100);
+        const priceWithoutTaxInCents = Math.round(priceInCents / taxMultiplier);
+        price = priceWithoutTaxInCents / 100;
     }
-    return Math.round(price * 100) / 100;
+    return price;
 }
